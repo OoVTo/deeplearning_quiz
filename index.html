@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Midterms Exam — Image Processing</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,500;0,700;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f11;
+    --surface: #16181c;
+    --surface2: #1e2026;
+    --border: #2a2d35;
+    --border2: #363a45;
+    --text: #e8e9ec;
+    --muted: #7a7f8e;
+    --accent: #c8f064;
+    --accent-dim: #a8cc4a;
+    --correct: #4ade80;
+    --correct-bg: #052a14;
+    --wrong: #f87171;
+    --wrong-bg: #2a0505;
+    --code-bg: #12141a;
+    --input-bg: #12141a;
+    --tag-bg: #1e2026;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+
+  .header-title {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .header-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    gap: 18px;
+  }
+
+  .header-meta span { display: flex; align-items: center; gap: 5px; }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: inline-block;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  /* ── HERO CARD ── */
+  .hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem 2rem 1.5rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,240,100,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .hero-title {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  .hero-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+
+  .stat-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 5px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .stat-chip b { color: var(--text); font-weight: 500; }
+
+  .btn-submit {
+    background: var(--accent);
+    color: #0e0f11;
+    border: none;
+    border-radius: var(--radius);
+    padding: 10px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.2px;
+  }
+
+  .btn-submit:hover { background: var(--accent-dim); }
+  .btn-submit:active { transform: scale(0.97); }
+
+  .result-banner {
+    display: none;
+    margin-top: 1.25rem;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .result-score {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .result-msg {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-block {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .section-rule {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0 10px;
+  }
+
+  .section-instr {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    padding: 8px 14px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .section-instr strong { color: var(--text); }
+
+  /* ── CHOICES GRID (Test 1) ── */
+  .choices-grid {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 5px 16px;
+  }
+
+  .choice-item {
+    font-size: 12.5px;
+    color: var(--text);
+    line-height: 1.4;
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+  }
+
+  .choice-letter {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
+    flex-shrink: 0;
+    min-width: 16px;
+  }
+
+  /* ── MATCH ROW ── */
+  .match-row {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .answer-input {
+    width: 44px;
+    height: 40px;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    text-transform: uppercase;
+    background: var(--input-bg);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text);
+    caret-color: var(--accent);
+    transition: border-color 0.15s;
+    outline: none;
+  }
+
+  .answer-input:focus { border-color: var(--accent); }
+  .answer-input.correct { border-color: var(--correct); background: var(--correct-bg); color: var(--correct); }
+  .answer-input.wrong { border-color: var(--wrong); background: var(--wrong-bg); color: var(--wrong); }
+
+  .stmt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 13px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  .item-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-right: 6px;
+  }
+
+  /* ── TEST 2 ── */
+  .tf-row {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 10px;
+    align-items: start;
+    margin-bottom: 10px;
+  }
+
+  .tf-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .tf-stmt {
+    padding: 8px 13px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.55;
+    display: flex;
+    gap: 6px;
+  }
+
+  .tf-stmt + .tf-stmt {
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .stmt-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    flex-shrink: 0;
+    padding-top: 2px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── TEST 3 CODE ── */
+  .code-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+    align-items: start;
+  }
+
+  @media (max-width: 600px) {
+    .code-row { grid-template-columns: 1fr; }
+    .header-meta { display: none; }
+  }
+
+  .code-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .item-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+  }
+
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 11px 13px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: #c9d1d9;
+    white-space: pre;
+    line-height: 1.7;
+    overflow-x: auto;
+  }
+
+  .kw { color: #ff7b72; }
+  .fn { color: #d2a8ff; }
+  .st { color: #a5d6ff; }
+  .nu { color: #79c0ff; }
+  .cm { color: #6a7282; font-style: italic; }
+
+  .output-area {
+    width: 100%;
+    min-height: 64px;
+    resize: vertical;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    color: var(--text);
+    line-height: 1.6;
+    transition: border-color 0.15s;
+    outline: none;
+    caret-color: var(--accent);
+  }
+
+  .output-area:focus { border-color: var(--accent); }
+  .output-area.correct { border-color: var(--correct); background: var(--correct-bg); }
+  .output-area.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+
+  .hint-text {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-bar-wrap {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--border);
+    z-index: 200;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+
+  /* ── SCROLL TO TOP ── */
+  .scroll-top {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    text-decoration: none;
+  }
+
+  .scroll-top.visible { opacity: 1; }
+  .scroll-top:hover { color: var(--text); border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-title">Image Processing Exam</div>
+  <div class="header-meta">
+    <span><span class="dot"></span> 100 items</span>
+    <span id="hdr-answered">0 answered</span>
+  </div>
+</header>
+
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="prog-bar"></div>
+</div>
+
+<a class="scroll-top" id="scroll-top" href="#top">↑</a>
+
+<div class="container" id="top">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">Midterms Examination</div>
+    <div class="hero-title">Computer Vision with Python<br><em style="font-weight:300">Image Thresholding &amp; Blurring</em></div>
+    <div class="hero-sub">OpenCV · NumPy · Matplotlib · Adaptive Methods · Filtering Techniques</div>
+    <div class="stat-row">
+      <div class="stat-chip">Test 1 <b>Matching</b> — 40 pts</div>
+      <div class="stat-chip">Test 2 <b>Statements</b> — 30 pts</div>
+      <div class="stat-chip">Test 3 <b>Code Output</b> — 30 pts</div>
+    </div>
+    <button class="btn-submit" onclick="submitExam()">Submit &amp; Check Answers</button>
+    <div class="result-banner" id="result-banner">
+      <div class="result-score" id="final-score"></div>
+      <div class="result-msg" id="final-msg"></div>
+    </div>
+  </div>
+
+  <!-- TEST 1 -->
+  <div class="section-block">
+    <div class="section-head">
+      <span class="section-num">Test 01</span>
+      <span class="section-title">Matching Type</span>
+    </div>
+    <div class="section-rule"></div>
+    <div class="section-instr">
+      Write the <strong>letter</strong> of the best matching answer in the box to the left of each statement. Letters may be used more than once.
+    </div>
+    <div class="choices-grid" id="choices-grid"></div>
+    <div id="test1-wrap"></div>
+  </div>
+
+  <!-- TEST 2 -->
+  <div class="section-block">
+    <div class="section-head">
+      <span class="section-num">Test 02</span>
+      <span class="section-title">Statement Evaluation</span>
+    </div>
+    <div class="section-rule"></div>
+    <div class="section-instr">
+      Two statements are given per item. Write:
+      <strong>A</strong> — only Statement 1 is correct &nbsp;·&nbsp;
+      <strong>B</strong> — only Statement 2 is correct &nbsp;·&nbsp;
+      <strong>C</strong> — both are correct &nbsp;·&nbsp;
+      <strong>D</strong> — neither is correct
+    </div>
+    <div id="test2-wrap"></div>
+  </div>
+
+  <!-- TEST 3 -->
+  <div class="section-block">
+    <div class="section-head">
+      <span class="section-num">Test 03</span>
+      <span class="section-title">Code Output</span>
+    </div>
+    <div class="section-rule"></div>
+    <div class="section-instr">
+      Read each code snippet and <strong>type the expected output</strong> exactly in the box on the right. Mind spacing and data types.
+    </div>
+    <div id="test3-wrap"></div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+/* ============================================================
+   DATA
+============================================================ */
+const CHOICES = [
+  {l:'A', t:'Erosion — cv2.erode()'},
+  {l:'B', t:'Dilation — cv2.dilate()'},
+  {l:'C', t:'Opening — cv2.MORPH_OPEN'},
+  {l:'D', t:'Closing — cv2.MORPH_CLOSE'},
+  {l:'E', t:'Morphological Gradient — cv2.MORPH_GRADIENT'},
+  {l:'F', t:'Gaussian Blur — cv2.GaussianBlur()'},
+  {l:'G', t:'Median Blur — cv2.medianBlur()'},
+  {l:'H', t:'Averaging / Box Filter — cv2.blur()'},
+  {l:'I', t:'Bilateral Filter — cv2.bilateralFilter()'},
+  {l:'J', t:'Kernel / Structuring Element'},
+  {l:'K', t:'Gamma Correction — np.power(img, gamma)'},
+  {l:'L', t:'White Noise'},
+  {l:'M', t:'Black Noise'},
+  {l:'N', t:'cv2.filter2D()'},
+  {l:'O', t:'np.zeros()'},
+  {l:'P', t:'cv2.FONT_HERSHEY_SIMPLEX'},
+  {l:'Q', t:'cv2.putText()'},
+  {l:'R', t:'np.ones() / 25 kernel'},
+  {l:'S', t:'cv2.COLOR_BGR2RGB'},
+  {l:'T', t:'Pixel value > T → 255 (White) — Binary Threshold rule'},
+];
+
+const T1 = [
+  // Morphological operators — from morphological_operators.py
+  {q:'Shrinks bright regions; removes small white noise from a foreground image.', a:'A'},
+  {q:'Grows bright regions; fills small holes in foreground objects.', a:'B'},
+  {q:'Erosion followed by dilation — removes white (foreground) noise.', a:'C'},
+  {q:'Dilation followed by erosion — removes black (background) noise / fills gaps.', a:'D'},
+  {q:'The difference between dilation and erosion of an image; highlights edges.', a:'E'},
+  {q:'The structuring element (matrix of ones) passed to cv2.erode() and cv2.dilate().', a:'J'},
+  {q:'Used in the morphological operators notebook to create a 600×600 blank canvas with np.zeros().', a:'O'},
+  {q:'The OpenCV function used to draw "GAB T." text on the blank image in the morphology notebook.', a:'Q'},
+  {q:'The default font constant used with cv2.putText() in the morphology demo.', a:'P'},
+  {q:'Random binary array scaled to 255, added to the image to simulate foreground speckle noise.', a:'L'},
+  // Gamma — from tong_midterms_quiz.py
+  {q:'Power-law operation applied as np.power(img, gamma); brightens when gamma < 1.', a:'K'},
+  {q:'When gamma = 1/4 is used in np.power(img, gamma), this transformation brightens the image.', a:'K'},
+  {q:'When gamma = 8 is used in np.power(img, gamma), this transformation darkens the image.', a:'K'},
+  {q:'The color conversion flag used to go from OpenCV BGR order to Matplotlib-compatible RGB.', a:'S'},
+  // Blurring — from tong_midterms_quiz.py
+  {q:'The OpenCV function used to apply a custom 5×5 averaging kernel to an image via convolution.', a:'N'},
+  {q:'A 5×5 matrix of ones divided by 25 — used as a normalized averaging kernel in the quiz.', a:'R'},
+  {q:'Blur achieved by passing ksize=(5,5) to cv2.blur() — used in the tong midterms quiz.', a:'H'},
+  {q:'Blur that uses a weighted average where center pixels contribute more than neighbors.', a:'F'},
+  {q:'Most effective blur for salt-and-pepper noise; uses the middle value of the neighborhood.', a:'G'},
+  {q:'Edge-preserving smoothing; considers both spatial distance and pixel intensity differences.', a:'I'},
+  // Mixed — conceptual
+  {q:'Random binary array scaled to -255, then clipped to 0, to simulate black speckle noise on white text.', a:'M'},
+  {q:'The operation that, with iterations=4, causes the text "GAB T." to visibly thin and shrink.', a:'A'},
+  {q:'The operation that, applied to a noisy image with white dots, uses MORPH_OPEN to clean it.', a:'C'},
+  {q:'The operation applied to black_noise_img using MORPH_CLOSE to restore white text regions.', a:'D'},
+  {q:'Highlights the outline/boundary of objects by computing dilation minus erosion.', a:'E'},
+  {q:'The function that loads bricks.jpg and normalizes pixel values to the range [0.0, 1.0].', a:'S'},
+  {q:'np.zeros((600,600)) creates this type of image — used as a blank canvas in the morphology notebook.', a:'O'},
+  {q:'The OpenCV function used to convolve an image with a custom kernel (not a named blur function).', a:'N'},
+  {q:'A 5×5 kernel where all values equal 1/25; equivalent to a box/averaging blur.', a:'R'},
+  {q:'The conversion applied as img.astype(np.float32) / 255 normalizes pixel range for this.', a:'K'},
+  // Remaining thresholding/blur classics
+  {q:'Blur function used as cv2.blur(img, ksize=(5,5)) in the tong midterms quiz notebook.', a:'H'},
+  {q:'The flag passed to cv2.cvtColor() to fix OpenCV\'s BGR channel order for Matplotlib display.', a:'S'},
+  {q:'Structuring element created with np.ones((5,5), np.uint8) used in erosion and dilation.', a:'J'},
+  {q:'The morphological operation that produces the image boundary by subtracting erosion from dilation.', a:'E'},
+  {q:'A gamma value less than 1 applied via np.power() results in this type of image transformation.', a:'K'},
+  {q:'The noise type added using white_noise * 255 + img in the morphological operators notebook.', a:'L'},
+  {q:'The noise type created using black_noise * -255, then clipping -255 to 0.', a:'M'},
+  {q:'Applying cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel) removes this type of noise.', a:'L'},
+  {q:'Applying cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel) fills holes caused by this noise type.', a:'M'},
+  {q:'The binary threshold rule: if pixel > T, output becomes 255 (white).', a:'T'},
+];
+
+const T2 = [
+  // Morphological operators
+  {s1:"Erosion shrinks bright (foreground) regions in a binary image.",
+   s2:"Dilation also shrinks bright regions by removing pixels from boundaries.", ans:'A'},
+  {s1:"cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel) applies erosion then dilation.",
+   s2:"Opening is used to remove small white noise dots from a bright foreground.", ans:'C'},
+  {s1:"cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel) applies dilation then erosion.",
+   s2:"Closing is used to fill small dark holes or gaps in a bright foreground.", ans:'C'},
+  {s1:"The morphological gradient is computed as dilation minus erosion of an image.",
+   s2:"The morphological gradient produces a blurred, smooth version of the image.", ans:'A'},
+  {s1:"In the morphology notebook, white noise is created as np.random.randint(0, 2, (600,600)) * 255.",
+   s2:"Adding this white noise array to the image introduces random black dot artifacts.", ans:'A'},
+  {s1:"Black noise is created by multiplying a binary random array by -255 and clipping -255 values to 0.",
+   s2:"Black noise introduces random white dot artifacts into the image.", ans:'A'},
+  {s1:"Increasing the iterations parameter in cv2.erode() produces a stronger erosion effect.",
+   s2:"Using iterations=4 in cv2.erode() erodes less than using iterations=1.", ans:'A'},
+  {s1:"np.ones((5,5), np.uint8) creates a 5×5 structuring element of all ones.",
+   s2:"The dtype of the structuring element must always be np.float32 for morphological operations.", ans:'A'},
+  // Gamma correction
+  {s1:"Applying np.power(img, 1/4) brightens the image because gamma < 1 expands dark pixel values.",
+   s2:"Applying np.power(img, 8) also brightens the image.", ans:'A'},
+  {s1:"Gamma correction using np.power() requires the image pixels to be normalized to [0.0, 1.0] first.",
+   s2:"If pixels are in the range [0, 255], np.power(img, 0.5) will still produce correct gamma output.", ans:'A'},
+  {s1:"img.astype(np.float32) / 255 converts pixel values from [0,255] to [0.0,1.0].",
+   s2:"This normalization step is needed before applying gamma correction with np.power().", ans:'C'},
+  {s1:"cv2.cvtColor(img, cv2.COLOR_BGR2RGB) reorders color channels for correct Matplotlib display.",
+   s2:"OpenCV loads images in RGB order by default.", ans:'A'},
+  // filter2D and kernel
+  {s1:"cv2.filter2D(img, -1, kernel) applies a custom convolution kernel to an image.",
+   s2:"The -1 in cv2.filter2D means the output depth matches the input image depth.", ans:'C'},
+  {s1:"A 5×5 kernel of np.ones((5,5), np.float32)/25 is mathematically equivalent to cv2.blur() with ksize=(5,5).",
+   s2:"cv2.filter2D() with this kernel produces a different result than cv2.blur() with ksize=(5,5).", ans:'A'},
+  {s1:"cv2.blur(img, ksize=(5,5)) and cv2.filter2D(img, -1, np.ones((5,5))/25) produce the same averaging effect.",
+   s2:"cv2.blur() internally uses a normalized box filter.", ans:'C'},
+  // Blurring conceptual
+  {s1:"cv2.GaussianBlur() requires kernel dimensions to be odd numbers.",
+   s2:"cv2.medianBlur() also requires an odd kernel size.", ans:'C'},
+  {s1:"cv2.medianBlur() replaces each pixel with the mean (average) of its neighborhood.",
+   s2:"cv2.medianBlur() is the best filter for removing salt-and-pepper noise.", ans:'B'},
+  {s1:"Bilateral filtering smooths an image while preserving edges.",
+   s2:"Bilateral filtering is faster than Gaussian blur.", ans:'A'},
+  {s1:"In the tong midterms quiz, cv2.putText() draws red text because color=(255,0,0) in BGR means red.",
+   s2:"In BGR format, color=(255,0,0) represents blue.", ans:'B'},
+  {s1:"cv2.putText() with color=(255,0,0) on a float32 image loaded via cv2.imread draws red text.",
+   s2:"After converting with COLOR_BGR2RGB, the same (255,0,0) values appear as blue in Matplotlib.", ans:'A'},
+  // Thresholding — kept classics
+  {s1:"cv2.threshold() returns two values: the threshold level and the thresholded image.",
+   s2:"When using Otsu's method, you do not pass a manual threshold value.", ans:'C'},
+  {s1:"Adaptive thresholding uses a single fixed threshold for the entire image.",
+   s2:"Adaptive thresholding is better than simple thresholding under non-uniform lighting.", ans:'B'},
+  {s1:"Otsu's thresholding works best on images with clearly bimodal histograms.",
+   s2:"Otsu's method can be applied directly to color (BGR) images without conversion.", ans:'A'},
+  {s1:"Simple thresholding performs poorly on images with spatially varying illumination.",
+   s2:"Adaptive thresholding was designed specifically to handle images with varying illumination.", ans:'C'},
+  {s1:"In THRESH_TOZERO, pixels above the threshold remain unchanged.",
+   s2:"In THRESH_TOZERO_INV, pixels above the threshold are set to 0.", ans:'C'},
+  // Pixel array / numpy
+  {s1:"np.zeros((600,600)) creates a 600×600 array filled with zeros, representing a black image.",
+   s2:"np.zeros() requires an explicit dtype argument; it cannot infer the type automatically.", ans:'A'},
+  {s1:"white_noise = np.random.randint(low=0, high=2, size=(600,600)) produces values of only 0 or 1.",
+   s2:"Multiplying white_noise by 255 produces an array containing only 0 or 255.", ans:'C'},
+  {s1:"black_noise = np.random.randint(0,2,(600,600)) * -255 produces values of 0 or -255.",
+   s2:"After setting black_noise_img[black_noise_img==-255]=0, negative values become white (255).", ans:'A'},
+  {s1:"Morphological Opening (MORPH_OPEN) removes foreground white noise added to a binary image.",
+   s2:"Morphological Closing (MORPH_CLOSE) also removes foreground white noise.", ans:'A'},
+  {s1:"Image thresholding is a fundamental form of image segmentation.",
+   s2:"Image segmentation always requires a machine learning model.", ans:'A'},
+];
+
+const T3 = [
+  // From morphological_operators.py
+  {code:`import numpy as np\nblank = np.zeros((600,600))\nprint(blank.shape)`, answer:`(600, 600)`, hint:'np.zeros((600,600)) produces a 2D array of that shape'},
+  {code:`import numpy as np\nblank = np.zeros((600,600))\nprint(blank.dtype)`, answer:`float64`, hint:'np.zeros() default dtype is float64'},
+  {code:`import numpy as np\nkernel = np.ones((5,5), np.uint8)\nprint(kernel.shape)`, answer:`(5, 5)`, hint:'Structuring element shape matches the given tuple'},
+  {code:`import numpy as np\nkernel = np.ones((5,5), np.uint8)\nprint(kernel.sum())`, answer:`25`, hint:'5×5 matrix of ones sums to 25'},
+  {code:`import numpy as np\nwn = np.random.randint(\n  low=0, high=2, size=(4,4))\nprint(wn.max())`, answer:`1`, hint:'randint(0,2) produces 0 or 1; max is 1'},
+  {code:`import numpy as np\nwn = np.random.randint(0,2,(3,3))\nwn = wn * 255\nprint(wn.dtype)`, answer:`int64`, hint:'Multiplying int array by int keeps int64 (not uint8)'},
+  {code:`import numpy as np\nbn = np.random.randint(0,2,(3,3))\nbn = bn * -255\nprint(bn.min())`, answer:`-255`, hint:'Binary array × -255 gives values 0 or -255; min is -255'},
+  {code:`import cv2\nprint(cv2.MORPH_OPEN)`, answer:`2`, hint:'Integer constant value of cv2.MORPH_OPEN'},
+  {code:`import cv2\nprint(cv2.MORPH_CLOSE)`, answer:`3`, hint:'Integer constant value of cv2.MORPH_CLOSE'},
+  {code:`import cv2\nprint(cv2.MORPH_GRADIENT)`, answer:`4`, hint:'Integer constant value of cv2.MORPH_GRADIENT'},
+  // From tong_midterms_quiz.py — gamma
+  {code:`import numpy as np\nimg = np.array([0.0, 0.5, 1.0])\ngamma = 1/4\nresult = np.power(img, gamma)\nprint(result.round(4))`, answer:`[0.     0.8409 1.    ]`, hint:'0^0.25=0, 0.5^0.25≈0.8409, 1^0.25=1'},
+  {code:`import numpy as np\nimg = np.array([0.0, 0.5, 1.0])\ngamma = 8\nresult = np.power(img, gamma)\nprint(result.round(4))`, answer:`[0.     0.0039 1.    ]`, hint:'0^8=0, 0.5^8=0.00390625≈0.0039, 1^8=1'},
+  {code:`import numpy as np\nimg = np.array([128], dtype=np.uint8)\nnorm = img.astype(np.float32) / 255\nprint(round(float(norm[0]), 4))`, answer:`0.502`, hint:'128/255 ≈ 0.50196... rounds to 0.502'},
+  {code:`import cv2\nprint(cv2.COLOR_BGR2RGB)`, answer:`4`, hint:'Integer value of the COLOR_BGR2RGB flag'},
+  // From tong_midterms_quiz.py — filter2D and blur
+  {code:`import numpy as np\nkernel = np.ones(\n  shape=(5,5),\n  dtype=np.float32)/25\nprint(round(kernel.sum(), 4))`, answer:`1.0`, hint:'25 elements each 1/25 — sums to 1.0'},
+  {code:`import numpy as np\nk = np.ones((5,5),np.float32)/25\nprint(round(k[2][2], 6))`, answer:`0.04`, hint:'Every element in the kernel equals 1/25 = 0.04'},
+  {code:`import cv2\nprint(cv2.FONT_HERSHEY_SIMPLEX)`, answer:`0`, hint:'Integer value of FONT_HERSHEY_SIMPLEX constant'},
+  {code:`import cv2\nprint(cv2.FONT_HERSHEY_COMPLEX)`, answer:`3`, hint:'Integer value of FONT_HERSHEY_COMPLEX constant'},
+  // From untitled.py — pixel array inspection
+  {code:`import numpy as np\nimg = np.array([\n  [80,80,200],\n  [80,80,80],\n  [200,80,80]\n])\nprint(img[0,2])`, answer:`200`, hint:'Row 0, column 2 of the array is 200'},
+  {code:`import numpy as np\nimg = np.array([\n  [80,80,200],\n  [80,80,80],\n  [200,80,80]\n])\nprint(img.shape)`, answer:`(3, 3)`, hint:'3 rows, 3 columns'},
+  // Kept classics — thresholding
+  {code:`import cv2, numpy as np\npx = np.array([[50,200],\n              [10,130]],\n              dtype=np.uint8)\nret,t = cv2.threshold(\n  px,127,255,cv2.THRESH_BINARY)\nprint(t)`, answer:`[[  0 255]\n [  0 255]]`, hint:'50<127→0, 200>127→255, 10<127→0, 130>127→255'},
+  {code:`import cv2, numpy as np\npx = np.array([[50,200]],\n              dtype=np.uint8)\nret,t = cv2.threshold(\n  px,100,255,cv2.THRESH_TRUNC)\nprint(t)`, answer:`[[ 50 100]]`, hint:'TRUNC: above T→T, below unchanged'},
+  {code:`import cv2, numpy as np\npx = np.array([[50,200]],\n              dtype=np.uint8)\nret,t = cv2.threshold(\n  px,100,255,cv2.THRESH_TOZERO)\nprint(t)`, answer:`[[  0 200]]`, hint:'TOZERO: below T→0, above unchanged'},
+  {code:`import cv2\nprint(cv2.THRESH_BINARY)`, answer:`0`, hint:'Integer constant of the flag'},
+  {code:`import cv2\nprint(cv2.THRESH_OTSU)`, answer:`8`, hint:'Integer flag value for THRESH_OTSU'},
+  {code:`import cv2\nprint(cv2.ADAPTIVE_THRESH_MEAN_C)`, answer:`0`, hint:'Integer value of ADAPTIVE_THRESH_MEAN_C'},
+  {code:`import numpy as np\nk = np.ones((3,3),np.float32) / 9\nprint(k.sum())`, answer:`1.0`, hint:'Normalized kernel: 9 × (1/9) = 1.0'},
+  {code:`import cv2\nimg = cv2.imread('i.jpg', 0)\nb = cv2.GaussianBlur(img,(3,3),0)\nprint(b.ndim)`, answer:`2`, hint:'Grayscale is a 2D array (H×W)'},
+  {code:`import numpy as np\narr = np.array([0,255,0,255,0],\n               dtype=np.uint8)\nprint(int(np.mean(arr)))`, answer:`102`, hint:'(0+255+0+255+0)/5 = 102'},
+  {code:`import numpy as np\nimg = np.array([0.5])\ngamma = 1/4\nprint(round(float(np.power(img,gamma)),4))`, answer:`0.8409`, hint:'0.5^0.25 = 0.84089...'},
+];
+
+/* ============================================================
+   BUILD UI
+============================================================ */
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function highlight(code){
+  return esc(code)
+    .replace(/(import|from|print|as)\b/g,'<span class="kw">$1</span>')
+    .replace(/(cv2|np|plt)\b/g,'<span class="fn">$1</span>')
+    .replace(/'([^']*)'/g,"<span class=\"st\">'$1'</span>")
+    .replace(/\b(\d+\.?\d*)\b/g,'<span class="nu">$1</span>')
+    .replace(/(#.*)/g,'<span class="cm">$1</span>');
+}
+
+function buildT1(){
+  const grid = document.getElementById('choices-grid');
+  CHOICES.forEach(c=>{
+    const d = document.createElement('div');
+    d.className = 'choice-item';
+    d.innerHTML = `<span class="choice-letter">${c.l}.</span>${esc(c.t)}`;
+    grid.appendChild(d);
+  });
+
+  const wrap = document.getElementById('test1-wrap');
+  T1.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className = 'match-row';
+    row.innerHTML = `
+      <input class="answer-input" type="text" maxlength="1"
+             id="t1-${i}" data-ans="${item.a}" data-section="t1"
+             placeholder="—" autocomplete="off">
+      <div class="stmt-card">
+        <span class="item-num">${i+1}</span>${esc(item.q)}
+      </div>`;
+    wrap.appendChild(row);
+  });
+}
+
+function buildT2(){
+  const wrap = document.getElementById('test2-wrap');
+  T2.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className = 'tf-row';
+    row.innerHTML = `
+      <input class="answer-input" type="text" maxlength="1"
+             id="t2-${i}" data-ans="${item.ans}" data-section="t2"
+             placeholder="—" autocomplete="off">
+      <div class="tf-card">
+        <div class="tf-stmt"><span class="stmt-tag">S1&nbsp;</span>${esc(item.s1)}</div>
+        <div class="tf-stmt"><span class="stmt-tag">S2&nbsp;</span>${esc(item.s2)}</div>
+      </div>`;
+    wrap.appendChild(row);
+  });
+}
+
+function buildT3(){
+  const wrap = document.getElementById('test3-wrap');
+  T3.forEach((item,i)=>{
+    const row = document.createElement('div');
+    row.className = 'code-row';
+    row.innerHTML = `
+      <div>
+        <div class="code-label">
+          <span>Code Snippet</span>
+          <span class="item-badge">#${71+i}</span>
+        </div>
+        <div class="code-block">${highlight(item.code)}</div>
+      </div>
+      <div>
+        <div class="code-label"><span>Your Answer — Expected Output</span></div>
+        <textarea class="output-area" id="t3-${i}"
+                  data-ans="${esc(item.answer)}" data-section="t3"
+                  placeholder="Type the output exactly..."></textarea>
+        <div class="hint-text">Hint: ${esc(item.hint)}</div>
+      </div>`;
+    wrap.appendChild(row);
+  });
+}
+
+/* ============================================================
+   LIVE PROGRESS
+============================================================ */
+function updateProgress(){
+  let filled = 0;
+  document.querySelectorAll('.answer-input').forEach(el=>{
+    if(el.value.trim()) filled++;
+  });
+  document.querySelectorAll('.output-area').forEach(el=>{
+    if(el.value.trim()) filled++;
+  });
+  const pct = Math.round((filled/100)*100);
+  document.getElementById('prog-bar').style.width = pct+'%';
+  document.getElementById('hdr-answered').textContent = filled+' answered';
+}
+
+/* ============================================================
+   SUBMIT
+============================================================ */
+function submitExam(){
+  let correct = 0;
+
+  document.querySelectorAll('.answer-input').forEach(el=>{
+    const user = el.value.trim().toUpperCase();
+    const ans  = el.dataset.ans.toUpperCase();
+    el.classList.remove('correct','wrong');
+    if(user === ans){ correct++; el.classList.add('correct'); }
+    else if(user)    el.classList.add('wrong');
+  });
+
+  document.querySelectorAll('.output-area').forEach(el=>{
+    const user = el.value.trim().replace(/[ \t]+/g,' ');
+    const ans  = el.dataset.ans.trim().replace(/[ \t]+/g,' ');
+    el.classList.remove('correct','wrong');
+    if(user === ans){ correct++; el.classList.add('correct'); }
+    else if(el.value.trim()) el.classList.add('wrong');
+  });
+
+  const pct = Math.round((correct/100)*100);
+  let grade, msg;
+  if(pct>=95){ grade='A+'; msg='Perfect or near-perfect. Exceptional mastery of the material!';}
+  else if(pct>=90){ grade='A'; msg='Excellent! Strong command of image processing concepts.';}
+  else if(pct>=85){ grade='B+'; msg='Very good! A few concepts need revisiting.';}
+  else if(pct>=80){ grade='B'; msg='Good work. Review the highlighted incorrect items.';}
+  else if(pct>=75){ grade='C+'; msg='Passing. Spend time reviewing incorrect answers carefully.';}
+  else if(pct>=70){ grade='C'; msg='Passing. Significant review recommended.';}
+  else { grade='F'; msg='Below passing. Re-read the slides and try again.';}
+
+  const banner = document.getElementById('result-banner');
+  document.getElementById('final-score').textContent = `${correct} / 100 — ${pct}% (${grade})`;
+  document.getElementById('final-msg').textContent = msg;
+  banner.style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ============================================================
+   SCROLL TO TOP BUTTON
+============================================================ */
+window.addEventListener('scroll',()=>{
+  const btn = document.getElementById('scroll-top');
+  btn.classList.toggle('visible', window.scrollY > 400);
+});
+
+/* ============================================================
+   INIT
+============================================================ */
+buildT1();
+buildT2();
+buildT3();
+
+document.addEventListener('input', updateProgress);
+
+// auto-advance to next input after single char
+document.addEventListener('keyup', e=>{
+  if(!e.target.classList.contains('answer-input')) return;
+  if(e.target.value.trim().length === 1){
+    const inputs = [...document.querySelectorAll('.answer-input')];
+    const idx = inputs.indexOf(e.target);
+    if(idx < inputs.length-1) inputs[idx+1].focus();
+  }
+});
+
+/* ============================================================
+   CHEAT CODE — press A then N then S to reveal all answers
+============================================================ */
+(function(){
+  const SEQ = ['a','n','s'];
+  let buf = [];
+  let revealed = false;
+
+  document.addEventListener('keydown', e=>{
+    // ignore keypresses inside text fields so typing doesn't trigger it
+    if(e.target.tagName === 'TEXTAREA') return;
+
+    const key = e.key.toLowerCase();
+    buf.push(key);
+    if(buf.length > SEQ.length) buf.shift();
+
+    if(buf.join('') === SEQ.join('')){
+      buf = [];
+      revealed = !revealed;
+      toggleAnswers(revealed);
+    }
+  });
+
+  function toggleAnswers(show){
+    // Test 1 & 2 — single-letter inputs
+    document.querySelectorAll('.answer-input').forEach(el=>{
+      if(show){
+        el.dataset.orig = el.value;
+        el.value = el.dataset.ans;
+        el.classList.remove('correct','wrong');
+        el.classList.add('cheat-fill');
+      } else {
+        el.value = el.dataset.orig ?? '';
+        el.classList.remove('cheat-fill');
+      }
+    });
+
+    // Test 3 — textareas
+    document.querySelectorAll('.output-area').forEach(el=>{
+      if(show){
+        el.dataset.orig = el.value;
+        el.value = el.dataset.ans;
+        el.classList.remove('correct','wrong');
+        el.classList.add('cheat-fill');
+      } else {
+        el.value = el.dataset.orig ?? '';
+        el.classList.remove('cheat-fill');
+      }
+    });
+
+    showToast(show
+      ? '🔓 Answers revealed — press A+N+S again to hide'
+      : '🔒 Answers hidden');
+
+    updateProgress();
+  }
+
+  function showToast(msg){
+    let toast = document.getElementById('cheat-toast');
+    if(!toast){
+      toast = document.createElement('div');
+      toast.id = 'cheat-toast';
+      toast.style.cssText = `
+        position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+        background:#1e2026; border:1px solid var(--accent);
+        color:var(--accent); font-family:'IBM Plex Mono',monospace;
+        font-size:12px; padding:9px 20px; border-radius:8px;
+        z-index:9999; white-space:nowrap;
+        box-shadow:0 4px 24px rgba(0,0,0,0.5);
+        transition:opacity 0.3s;
+      `;
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(()=>{ toast.style.opacity='0'; }, 2800);
+  }
+})();
+</script>
+
+<style>
+  .cheat-fill {
+    color: var(--accent) !important;
+    border-color: var(--accent) !important;
+    background: rgba(200,240,100,0.06) !important;
+  }
+</style>
+</body>
+</html>
