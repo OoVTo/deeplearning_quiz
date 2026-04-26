@@ -28,7 +28,6 @@
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { scroll-behavior: smooth; }
 
   body {
@@ -40,7 +39,6 @@
     line-height: 1.6;
   }
 
-  /* ── HEADER ── */
   .site-header {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
@@ -85,14 +83,12 @@
     50% { opacity: 0.3; }
   }
 
-  /* ── LAYOUT ── */
   .container {
     max-width: 900px;
     margin: 0 auto;
     padding: 2.5rem 1.5rem 4rem;
   }
 
-  /* ── HERO CARD ── */
   .hero {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -200,10 +196,7 @@
     margin-top: 3px;
   }
 
-  /* ── SECTION HEADERS ── */
-  .section-block {
-    margin-bottom: 2.5rem;
-  }
+  .section-block { margin-bottom: 2.5rem; }
 
   .section-head {
     display: flex;
@@ -247,7 +240,62 @@
 
   .section-instr strong { color: var(--text); }
 
-  /* ── CHOICES GRID (Test 1) ── */
+  /* ── NEW: Definition Note Banner ── */
+  .def-note-banner {
+    background: linear-gradient(135deg, rgba(200,240,100,0.05), rgba(200,240,100,0.02));
+    border: 1px solid rgba(200,240,100,0.25);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .def-note-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .def-note-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(200,240,100,0.2);
+  }
+
+  .def-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 8px;
+  }
+
+  .def-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+  }
+
+  .def-term {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+  }
+
+  .def-body {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
   .choices-grid {
     background: var(--surface2);
     border: 1px solid var(--border);
@@ -277,7 +325,9 @@
     min-width: 16px;
   }
 
-  /* ── MATCH ROW ── */
+  .choice-item.new-choice .choice-letter { color: #f0a0ff; }
+  .choice-item.new-choice { opacity: 0.95; }
+
   .match-row {
     display: grid;
     grid-template-columns: 44px 1fr;
@@ -317,6 +367,10 @@
     line-height: 1.55;
   }
 
+  .stmt-card.new-item {
+    border-left: 3px solid rgba(240,160,255,0.4);
+  }
+
   .item-num {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
@@ -324,7 +378,6 @@
     margin-right: 6px;
   }
 
-  /* ── TEST 2 ── */
   .tf-row {
     display: grid;
     grid-template-columns: 44px 1fr;
@@ -363,7 +416,6 @@
     letter-spacing: 0.5px;
   }
 
-  /* ── TEST 3 CODE ── */
   .code-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -375,6 +427,7 @@
   @media (max-width: 600px) {
     .code-row { grid-template-columns: 1fr; }
     .header-meta { display: none; }
+    .def-grid { grid-template-columns: 1fr; }
   }
 
   .code-label {
@@ -442,7 +495,6 @@
     font-style: italic;
   }
 
-  /* ── PROGRESS ── */
   .progress-bar-wrap {
     position: fixed;
     bottom: 0; left: 0; right: 0;
@@ -458,7 +510,6 @@
     width: 0%;
   }
 
-  /* ── SCROLL TO TOP ── */
   .scroll-top {
     position: fixed;
     bottom: 20px; right: 20px;
@@ -477,6 +528,12 @@
 
   .scroll-top.visible { opacity: 1; }
   .scroll-top:hover { color: var(--text); border-color: var(--accent); }
+
+  .cheat-fill {
+    color: var(--accent) !important;
+    border-color: var(--accent) !important;
+    background: rgba(200,240,100,0.06) !important;
+  }
 </style>
 </head>
 <body>
@@ -484,7 +541,7 @@
 <header class="site-header">
   <div class="header-title">Image Processing Exam</div>
   <div class="header-meta">
-    <span><span class="dot"></span> 100 items</span>
+    <span><span class="dot"></span> 105 items</span>
     <span id="hdr-answered">0 answered</span>
   </div>
 </header>
@@ -503,7 +560,7 @@
     <div class="hero-title">Computer Vision with Python<br><em style="font-weight:300">Image Thresholding &amp; Blurring</em></div>
     <div class="hero-sub">OpenCV · NumPy · Matplotlib · Adaptive Methods · Filtering Techniques</div>
     <div class="stat-row">
-      <div class="stat-chip">Test 1 <b>Matching</b> — 40 pts</div>
+      <div class="stat-chip">Test 1 <b>Matching</b> — 45 pts</div>
       <div class="stat-chip">Test 2 <b>Statements</b> — 30 pts</div>
       <div class="stat-chip">Test 3 <b>Code Output</b> — 30 pts</div>
     </div>
@@ -511,6 +568,33 @@
     <div class="result-banner" id="result-banner">
       <div class="result-score" id="final-score"></div>
       <div class="result-msg" id="final-msg"></div>
+    </div>
+  </div>
+
+  <!-- CLASSROOM NOTES REFERENCE -->
+  <div class="def-note-banner">
+    <div class="def-note-title">📋 Classroom Notes — Morphological Operators Reference</div>
+    <div class="def-grid">
+      <div class="def-item">
+        <div class="def-term">MORPHOLOGICAL OPERATORS</div>
+        <div class="def-body">Sets of kernels that achieve a variety of effects such as reducing noise. Can achieve erosion &amp; dilation effects on an existing image. Effect is most easily seen on text data.</div>
+      </div>
+      <div class="def-item">
+        <div class="def-term">EROSION</div>
+        <div class="def-body">Erodes away boundaries of foreground objects. Works best when foreground is light color (preferably white) and background is dark.</div>
+      </div>
+      <div class="def-item">
+        <div class="def-term">OPENING (MORPH_OPEN)</div>
+        <div class="def-body">Erosion followed by dilation. Useful in removing <em>background</em> noise (white dots on dark background).</div>
+      </div>
+      <div class="def-item">
+        <div class="def-term">CLOSING (MORPH_CLOSE)</div>
+        <div class="def-body">Useful in removing noise from <em>foreground</em> objects, such as black dots on top of white texts.</div>
+      </div>
+      <div class="def-item">
+        <div class="def-term">MORPHOLOGICAL GRADIENT</div>
+        <div class="def-body">Difference between dilation and erosion of an image — highlights object boundaries/edges.</div>
+      </div>
     </div>
   </div>
 
@@ -522,7 +606,7 @@
     </div>
     <div class="section-rule"></div>
     <div class="section-instr">
-      Write the <strong>letter</strong> of the best matching answer in the box to the left of each statement. Letters may be used more than once.
+      Write the <strong>letter</strong> of the best matching answer in the box to the left of each statement. Letters may be used more than once. <strong>Choice U</strong> refers to the general concept of Morphological Operators.
     </div>
     <div class="choices-grid" id="choices-grid"></div>
     <div id="test1-wrap"></div>
@@ -558,33 +642,35 @@
     <div id="test3-wrap"></div>
   </div>
 
-</div><!-- /container -->
+</div>
 
 <script>
 /* ============================================================
    DATA
 ============================================================ */
 const CHOICES = [
-  {l:'A', t:'Erosion — cv2.erode()'},
-  {l:'B', t:'Dilation — cv2.dilate()'},
-  {l:'C', t:'Opening — cv2.MORPH_OPEN'},
-  {l:'D', t:'Closing — cv2.MORPH_CLOSE'},
-  {l:'E', t:'Morphological Gradient — cv2.MORPH_GRADIENT'},
-  {l:'F', t:'Gaussian Blur — cv2.GaussianBlur()'},
-  {l:'G', t:'Median Blur — cv2.medianBlur()'},
-  {l:'H', t:'Averaging / Box Filter — cv2.blur()'},
-  {l:'I', t:'Bilateral Filter — cv2.bilateralFilter()'},
-  {l:'J', t:'Kernel / Structuring Element'},
-  {l:'K', t:'Gamma Correction — np.power(img, gamma)'},
-  {l:'L', t:'White Noise'},
-  {l:'M', t:'Black Noise'},
-  {l:'N', t:'cv2.filter2D()'},
-  {l:'O', t:'np.zeros()'},
-  {l:'P', t:'cv2.FONT_HERSHEY_SIMPLEX'},
-  {l:'Q', t:'cv2.putText()'},
-  {l:'R', t:'np.ones() / 25 kernel'},
-  {l:'S', t:'cv2.COLOR_BGR2RGB'},
-  {l:'T', t:'Pixel value > T → 255 (White) — Binary Threshold rule'},
+  {l:'A', t:'Erosion — cv2.erode()', isNew:false},
+  {l:'B', t:'Dilation — cv2.dilate()', isNew:false},
+  {l:'C', t:'Opening — cv2.MORPH_OPEN', isNew:false},
+  {l:'D', t:'Closing — cv2.MORPH_CLOSE', isNew:false},
+  {l:'E', t:'Morphological Gradient — cv2.MORPH_GRADIENT', isNew:false},
+  {l:'F', t:'Gaussian Blur — cv2.GaussianBlur()', isNew:false},
+  {l:'G', t:'Median Blur — cv2.medianBlur()', isNew:false},
+  {l:'H', t:'Averaging / Box Filter — cv2.blur()', isNew:false},
+  {l:'I', t:'Bilateral Filter — cv2.bilateralFilter()', isNew:false},
+  {l:'J', t:'Kernel / Structuring Element', isNew:false},
+  {l:'K', t:'Gamma Correction — np.power(img, gamma)', isNew:false},
+  {l:'L', t:'White Noise', isNew:false},
+  {l:'M', t:'Black Noise', isNew:false},
+  {l:'N', t:'cv2.filter2D()', isNew:false},
+  {l:'O', t:'np.zeros()', isNew:false},
+  {l:'P', t:'cv2.FONT_HERSHEY_SIMPLEX', isNew:false},
+  {l:'Q', t:'cv2.putText()', isNew:false},
+  {l:'R', t:'np.ones() / 25 kernel', isNew:false},
+  {l:'S', t:'cv2.COLOR_BGR2RGB', isNew:false},
+  {l:'T', t:'Pixel value > T → 255 (White) — Binary Threshold rule', isNew:false},
+  // ── NEW from classroom notes ──
+  {l:'U', t:'Morphological Operators — sets of kernels for noise reduction & shape operations', isNew:true},
 ];
 
 const T1 = [
@@ -599,19 +685,19 @@ const T1 = [
   {q:'The OpenCV function used to draw "GAB T." text on the blank image in the morphology notebook.', a:'Q'},
   {q:'The default font constant used with cv2.putText() in the morphology demo.', a:'P'},
   {q:'Random binary array scaled to 255, added to the image to simulate foreground speckle noise.', a:'L'},
-  // Gamma — from tong_midterms_quiz.py
+  // Gamma
   {q:'Power-law operation applied as np.power(img, gamma); brightens when gamma < 1.', a:'K'},
   {q:'When gamma = 1/4 is used in np.power(img, gamma), this transformation brightens the image.', a:'K'},
   {q:'When gamma = 8 is used in np.power(img, gamma), this transformation darkens the image.', a:'K'},
   {q:'The color conversion flag used to go from OpenCV BGR order to Matplotlib-compatible RGB.', a:'S'},
-  // Blurring — from tong_midterms_quiz.py
+  // Blurring
   {q:'The OpenCV function used to apply a custom 5×5 averaging kernel to an image via convolution.', a:'N'},
   {q:'A 5×5 matrix of ones divided by 25 — used as a normalized averaging kernel in the quiz.', a:'R'},
   {q:'Blur achieved by passing ksize=(5,5) to cv2.blur() — used in the tong midterms quiz.', a:'H'},
   {q:'Blur that uses a weighted average where center pixels contribute more than neighbors.', a:'F'},
   {q:'Most effective blur for salt-and-pepper noise; uses the middle value of the neighborhood.', a:'G'},
   {q:'Edge-preserving smoothing; considers both spatial distance and pixel intensity differences.', a:'I'},
-  // Mixed — conceptual
+  // Mixed
   {q:'Random binary array scaled to -255, then clipped to 0, to simulate black speckle noise on white text.', a:'M'},
   {q:'The operation that, with iterations=4, causes the text "GAB T." to visibly thin and shrink.', a:'A'},
   {q:'The operation that, applied to a noisy image with white dots, uses MORPH_OPEN to clean it.', a:'C'},
@@ -622,7 +708,6 @@ const T1 = [
   {q:'The OpenCV function used to convolve an image with a custom kernel (not a named blur function).', a:'N'},
   {q:'A 5×5 kernel where all values equal 1/25; equivalent to a box/averaging blur.', a:'R'},
   {q:'The conversion applied as img.astype(np.float32) / 255 normalizes pixel range for this.', a:'K'},
-  // Remaining thresholding/blur classics
   {q:'Blur function used as cv2.blur(img, ksize=(5,5)) in the tong midterms quiz notebook.', a:'H'},
   {q:'The flag passed to cv2.cvtColor() to fix OpenCV\'s BGR channel order for Matplotlib display.', a:'S'},
   {q:'Structuring element created with np.ones((5,5), np.uint8) used in erosion and dilation.', a:'J'},
@@ -633,10 +718,15 @@ const T1 = [
   {q:'Applying cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel) removes this type of noise.', a:'L'},
   {q:'Applying cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel) fills holes caused by this noise type.', a:'M'},
   {q:'The binary threshold rule: if pixel > T, output becomes 255 (white).', a:'T'},
+  // ── NEW items from classroom notes ──────────────────────────────
+  {q:'[CLASS NOTES] "Sets of kernels that can achieve a variety of effects such as reducing noise" — this describes which general concept?', a:'U', isNew:true},
+  {q:'[CLASS NOTES] Erodes away boundaries of foreground objects; works best when foreground is light color (preferably white) and background is dark.', a:'A', isNew:true},
+  {q:'[CLASS NOTES] "OPening is erosion followed by dilation. Useful in removing background noise!" — this matches which operation?', a:'C', isNew:true},
+  {q:'[CLASS NOTES] "Useful in removing noise from foreground objects, such as black dots on top of white texts." — this matches which operation?', a:'D', isNew:true},
+  {q:'[CLASS NOTES] "Difference between dilation and erosion of an image" — this is the classroom definition of which morphological operation?', a:'E', isNew:true},
 ];
 
 const T2 = [
-  // Morphological operators
   {s1:"Erosion shrinks bright (foreground) regions in a binary image.",
    s2:"Dilation also shrinks bright regions by removing pixels from boundaries.", ans:'A'},
   {s1:"cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel) applies erosion then dilation.",
@@ -653,7 +743,6 @@ const T2 = [
    s2:"Using iterations=4 in cv2.erode() erodes less than using iterations=1.", ans:'A'},
   {s1:"np.ones((5,5), np.uint8) creates a 5×5 structuring element of all ones.",
    s2:"The dtype of the structuring element must always be np.float32 for morphological operations.", ans:'A'},
-  // Gamma correction
   {s1:"Applying np.power(img, 1/4) brightens the image because gamma < 1 expands dark pixel values.",
    s2:"Applying np.power(img, 8) also brightens the image.", ans:'A'},
   {s1:"Gamma correction using np.power() requires the image pixels to be normalized to [0.0, 1.0] first.",
@@ -662,14 +751,12 @@ const T2 = [
    s2:"This normalization step is needed before applying gamma correction with np.power().", ans:'C'},
   {s1:"cv2.cvtColor(img, cv2.COLOR_BGR2RGB) reorders color channels for correct Matplotlib display.",
    s2:"OpenCV loads images in RGB order by default.", ans:'A'},
-  // filter2D and kernel
   {s1:"cv2.filter2D(img, -1, kernel) applies a custom convolution kernel to an image.",
    s2:"The -1 in cv2.filter2D means the output depth matches the input image depth.", ans:'C'},
   {s1:"A 5×5 kernel of np.ones((5,5), np.float32)/25 is mathematically equivalent to cv2.blur() with ksize=(5,5).",
    s2:"cv2.filter2D() with this kernel produces a different result than cv2.blur() with ksize=(5,5).", ans:'A'},
   {s1:"cv2.blur(img, ksize=(5,5)) and cv2.filter2D(img, -1, np.ones((5,5))/25) produce the same averaging effect.",
    s2:"cv2.blur() internally uses a normalized box filter.", ans:'C'},
-  // Blurring conceptual
   {s1:"cv2.GaussianBlur() requires kernel dimensions to be odd numbers.",
    s2:"cv2.medianBlur() also requires an odd kernel size.", ans:'C'},
   {s1:"cv2.medianBlur() replaces each pixel with the mean (average) of its neighborhood.",
@@ -680,7 +767,6 @@ const T2 = [
    s2:"In BGR format, color=(255,0,0) represents blue.", ans:'B'},
   {s1:"cv2.putText() with color=(255,0,0) on a float32 image loaded via cv2.imread draws red text.",
    s2:"After converting with COLOR_BGR2RGB, the same (255,0,0) values appear as blue in Matplotlib.", ans:'A'},
-  // Thresholding — kept classics
   {s1:"cv2.threshold() returns two values: the threshold level and the thresholded image.",
    s2:"When using Otsu's method, you do not pass a manual threshold value.", ans:'C'},
   {s1:"Adaptive thresholding uses a single fixed threshold for the entire image.",
@@ -691,7 +777,6 @@ const T2 = [
    s2:"Adaptive thresholding was designed specifically to handle images with varying illumination.", ans:'C'},
   {s1:"In THRESH_TOZERO, pixels above the threshold remain unchanged.",
    s2:"In THRESH_TOZERO_INV, pixels above the threshold are set to 0.", ans:'C'},
-  // Pixel array / numpy
   {s1:"np.zeros((600,600)) creates a 600×600 array filled with zeros, representing a black image.",
    s2:"np.zeros() requires an explicit dtype argument; it cannot infer the type automatically.", ans:'A'},
   {s1:"white_noise = np.random.randint(low=0, high=2, size=(600,600)) produces values of only 0 or 1.",
@@ -705,7 +790,6 @@ const T2 = [
 ];
 
 const T3 = [
-  // From morphological_operators.py
   {code:`import numpy as np\nblank = np.zeros((600,600))\nprint(blank.shape)`, answer:`(600, 600)`, hint:'np.zeros((600,600)) produces a 2D array of that shape'},
   {code:`import numpy as np\nblank = np.zeros((600,600))\nprint(blank.dtype)`, answer:`float64`, hint:'np.zeros() default dtype is float64'},
   {code:`import numpy as np\nkernel = np.ones((5,5), np.uint8)\nprint(kernel.shape)`, answer:`(5, 5)`, hint:'Structuring element shape matches the given tuple'},
@@ -716,20 +800,16 @@ const T3 = [
   {code:`import cv2\nprint(cv2.MORPH_OPEN)`, answer:`2`, hint:'Integer constant value of cv2.MORPH_OPEN'},
   {code:`import cv2\nprint(cv2.MORPH_CLOSE)`, answer:`3`, hint:'Integer constant value of cv2.MORPH_CLOSE'},
   {code:`import cv2\nprint(cv2.MORPH_GRADIENT)`, answer:`4`, hint:'Integer constant value of cv2.MORPH_GRADIENT'},
-  // From tong_midterms_quiz.py — gamma
   {code:`import numpy as np\nimg = np.array([0.0, 0.5, 1.0])\ngamma = 1/4\nresult = np.power(img, gamma)\nprint(result.round(4))`, answer:`[0.     0.8409 1.    ]`, hint:'0^0.25=0, 0.5^0.25≈0.8409, 1^0.25=1'},
   {code:`import numpy as np\nimg = np.array([0.0, 0.5, 1.0])\ngamma = 8\nresult = np.power(img, gamma)\nprint(result.round(4))`, answer:`[0.     0.0039 1.    ]`, hint:'0^8=0, 0.5^8=0.00390625≈0.0039, 1^8=1'},
   {code:`import numpy as np\nimg = np.array([128], dtype=np.uint8)\nnorm = img.astype(np.float32) / 255\nprint(round(float(norm[0]), 4))`, answer:`0.502`, hint:'128/255 ≈ 0.50196... rounds to 0.502'},
   {code:`import cv2\nprint(cv2.COLOR_BGR2RGB)`, answer:`4`, hint:'Integer value of the COLOR_BGR2RGB flag'},
-  // From tong_midterms_quiz.py — filter2D and blur
   {code:`import numpy as np\nkernel = np.ones(\n  shape=(5,5),\n  dtype=np.float32)/25\nprint(round(kernel.sum(), 4))`, answer:`1.0`, hint:'25 elements each 1/25 — sums to 1.0'},
   {code:`import numpy as np\nk = np.ones((5,5),np.float32)/25\nprint(round(k[2][2], 6))`, answer:`0.04`, hint:'Every element in the kernel equals 1/25 = 0.04'},
   {code:`import cv2\nprint(cv2.FONT_HERSHEY_SIMPLEX)`, answer:`0`, hint:'Integer value of FONT_HERSHEY_SIMPLEX constant'},
   {code:`import cv2\nprint(cv2.FONT_HERSHEY_COMPLEX)`, answer:`3`, hint:'Integer value of FONT_HERSHEY_COMPLEX constant'},
-  // From untitled.py — pixel array inspection
   {code:`import numpy as np\nimg = np.array([\n  [80,80,200],\n  [80,80,80],\n  [200,80,80]\n])\nprint(img[0,2])`, answer:`200`, hint:'Row 0, column 2 of the array is 200'},
   {code:`import numpy as np\nimg = np.array([\n  [80,80,200],\n  [80,80,80],\n  [200,80,80]\n])\nprint(img.shape)`, answer:`(3, 3)`, hint:'3 rows, 3 columns'},
-  // Kept classics — thresholding
   {code:`import cv2, numpy as np\npx = np.array([[50,200],\n              [10,130]],\n              dtype=np.uint8)\nret,t = cv2.threshold(\n  px,127,255,cv2.THRESH_BINARY)\nprint(t)`, answer:`[[  0 255]\n [  0 255]]`, hint:'50<127→0, 200>127→255, 10<127→0, 130>127→255'},
   {code:`import cv2, numpy as np\npx = np.array([[50,200]],\n              dtype=np.uint8)\nret,t = cv2.threshold(\n  px,100,255,cv2.THRESH_TRUNC)\nprint(t)`, answer:`[[ 50 100]]`, hint:'TRUNC: above T→T, below unchanged'},
   {code:`import cv2, numpy as np\npx = np.array([[50,200]],\n              dtype=np.uint8)\nret,t = cv2.threshold(\n  px,100,255,cv2.THRESH_TOZERO)\nprint(t)`, answer:`[[  0 200]]`, hint:'TOZERO: below T→0, above unchanged'},
@@ -741,6 +821,9 @@ const T3 = [
   {code:`import numpy as np\narr = np.array([0,255,0,255,0],\n               dtype=np.uint8)\nprint(int(np.mean(arr)))`, answer:`102`, hint:'(0+255+0+255+0)/5 = 102'},
   {code:`import numpy as np\nimg = np.array([0.5])\ngamma = 1/4\nprint(round(float(np.power(img,gamma)),4))`, answer:`0.8409`, hint:'0.5^0.25 = 0.84089...'},
 ];
+
+/* Total items = T1.length + T2.length + T3.length */
+const TOTAL = T1.length + T2.length + T3.length;
 
 /* ============================================================
    BUILD UI
@@ -760,7 +843,7 @@ function buildT1(){
   const grid = document.getElementById('choices-grid');
   CHOICES.forEach(c=>{
     const d = document.createElement('div');
-    d.className = 'choice-item';
+    d.className = 'choice-item' + (c.isNew ? ' new-choice' : '');
     d.innerHTML = `<span class="choice-letter">${c.l}.</span>${esc(c.t)}`;
     grid.appendChild(d);
   });
@@ -769,11 +852,12 @@ function buildT1(){
   T1.forEach((item,i)=>{
     const row = document.createElement('div');
     row.className = 'match-row';
+    const cardClass = item.isNew ? 'stmt-card new-item' : 'stmt-card';
     row.innerHTML = `
       <input class="answer-input" type="text" maxlength="1"
              id="t1-${i}" data-ans="${item.a}" data-section="t1"
              placeholder="—" autocomplete="off">
-      <div class="stmt-card">
+      <div class="${cardClass}">
         <span class="item-num">${i+1}</span>${esc(item.q)}
       </div>`;
     wrap.appendChild(row);
@@ -785,12 +869,13 @@ function buildT2(){
   T2.forEach((item,i)=>{
     const row = document.createElement('div');
     row.className = 'tf-row';
+    const num = T1.length + i + 1;
     row.innerHTML = `
       <input class="answer-input" type="text" maxlength="1"
              id="t2-${i}" data-ans="${item.ans}" data-section="t2"
              placeholder="—" autocomplete="off">
       <div class="tf-card">
-        <div class="tf-stmt"><span class="stmt-tag">S1&nbsp;</span>${esc(item.s1)}</div>
+        <div class="tf-stmt"><span class="stmt-tag">S1&nbsp;</span><span class="item-num">${num}</span>${esc(item.s1)}</div>
         <div class="tf-stmt"><span class="stmt-tag">S2&nbsp;</span>${esc(item.s2)}</div>
       </div>`;
     wrap.appendChild(row);
@@ -802,11 +887,12 @@ function buildT3(){
   T3.forEach((item,i)=>{
     const row = document.createElement('div');
     row.className = 'code-row';
+    const num = T1.length + T2.length + i + 1;
     row.innerHTML = `
       <div>
         <div class="code-label">
           <span>Code Snippet</span>
-          <span class="item-badge">#${71+i}</span>
+          <span class="item-badge">#${num}</span>
         </div>
         <div class="code-block">${highlight(item.code)}</div>
       </div>
@@ -832,7 +918,7 @@ function updateProgress(){
   document.querySelectorAll('.output-area').forEach(el=>{
     if(el.value.trim()) filled++;
   });
-  const pct = Math.round((filled/100)*100);
+  const pct = Math.round((filled/TOTAL)*100);
   document.getElementById('prog-bar').style.width = pct+'%';
   document.getElementById('hdr-answered').textContent = filled+' answered';
 }
@@ -859,7 +945,7 @@ function submitExam(){
     else if(el.value.trim()) el.classList.add('wrong');
   });
 
-  const pct = Math.round((correct/100)*100);
+  const pct = Math.round((correct/TOTAL)*100);
   let grade, msg;
   if(pct>=95){ grade='A+'; msg='Perfect or near-perfect. Exceptional mastery of the material!';}
   else if(pct>=90){ grade='A'; msg='Excellent! Strong command of image processing concepts.';}
@@ -870,14 +956,14 @@ function submitExam(){
   else { grade='F'; msg='Below passing. Re-read the slides and try again.';}
 
   const banner = document.getElementById('result-banner');
-  document.getElementById('final-score').textContent = `${correct} / 100 — ${pct}% (${grade})`;
+  document.getElementById('final-score').textContent = `${correct} / ${TOTAL} — ${pct}% (${grade})`;
   document.getElementById('final-msg').textContent = msg;
   banner.style.display = 'block';
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
 /* ============================================================
-   SCROLL TO TOP BUTTON
+   SCROLL TO TOP
 ============================================================ */
 window.addEventListener('scroll',()=>{
   const btn = document.getElementById('scroll-top');
@@ -891,9 +977,12 @@ buildT1();
 buildT2();
 buildT3();
 
+// Update header total dynamically
+document.querySelector('.header-meta span').innerHTML =
+  `<span class="dot"></span> ${TOTAL} items`;
+
 document.addEventListener('input', updateProgress);
 
-// auto-advance to next input after single char
 document.addEventListener('keyup', e=>{
   if(!e.target.classList.contains('answer-input')) return;
   if(e.target.value.trim().length === 1){
@@ -912,13 +1001,10 @@ document.addEventListener('keyup', e=>{
   let revealed = false;
 
   document.addEventListener('keydown', e=>{
-    // ignore keypresses inside text fields so typing doesn't trigger it
     if(e.target.tagName === 'TEXTAREA') return;
-
     const key = e.key.toLowerCase();
     buf.push(key);
     if(buf.length > SEQ.length) buf.shift();
-
     if(buf.join('') === SEQ.join('')){
       buf = [];
       revealed = !revealed;
@@ -927,7 +1013,6 @@ document.addEventListener('keyup', e=>{
   });
 
   function toggleAnswers(show){
-    // Test 1 & 2 — single-letter inputs
     document.querySelectorAll('.answer-input').forEach(el=>{
       if(show){
         el.dataset.orig = el.value;
@@ -939,8 +1024,6 @@ document.addEventListener('keyup', e=>{
         el.classList.remove('cheat-fill');
       }
     });
-
-    // Test 3 — textareas
     document.querySelectorAll('.output-area').forEach(el=>{
       if(show){
         el.dataset.orig = el.value;
@@ -952,11 +1035,9 @@ document.addEventListener('keyup', e=>{
         el.classList.remove('cheat-fill');
       }
     });
-
     showToast(show
       ? '🔓 Answers revealed — press A+N+S again to hide'
       : '🔒 Answers hidden');
-
     updateProgress();
   }
 
@@ -983,13 +1064,5 @@ document.addEventListener('keyup', e=>{
   }
 })();
 </script>
-
-<style>
-  .cheat-fill {
-    color: var(--accent) !important;
-    border-color: var(--accent) !important;
-    background: rgba(200,240,100,0.06) !important;
-  }
-</style>
 </body>
 </html>
