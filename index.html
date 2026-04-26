@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Midterms Exam — Image Processing</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,500;0,700;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Image Processing — Flashcards</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,300;1,9..144,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0e0f11;
@@ -13,451 +13,326 @@
     --border: #2a2d35;
     --border2: #363a45;
     --text: #e8e9ec;
-    --muted: #7a7f8e;
+    --muted: #6a7080;
     --accent: #c8f064;
-    --accent-dim: #a8cc4a;
+    --accent-dim: rgba(200,240,100,0.12);
     --correct: #4ade80;
     --correct-bg: #052a14;
     --wrong: #f87171;
     --wrong-bg: #2a0505;
-    --code-bg: #12141a;
-    --input-bg: #12141a;
-    --tag-bg: #1e2026;
-    --radius: 8px;
-    --radius-lg: 12px;
+    --radius: 10px;
+    --radius-lg: 18px;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  html { height: 100%; }
 
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px 40px;
     font-size: 15px;
-    line-height: 1.6;
   }
 
-  .site-header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    width: 100%;
+    max-width: 680px;
+    padding: 24px 0 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 56px;
+    position: relative;
+    z-index: 1;
   }
 
-  .header-title {
+  .logo {
     font-family: 'Fraunces', serif;
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 500;
     color: var(--text);
     letter-spacing: -0.3px;
-  }
-
-  .header-meta {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
     display: flex;
-    gap: 18px;
+    align-items: center;
+    gap: 10px;
   }
 
-  .header-meta span { display: flex; align-items: center; gap: 5px; }
-
-  .dot {
-    width: 7px; height: 7px;
+  .logo-dot {
+    width: 8px; height: 8px;
     border-radius: 50%;
     background: var(--accent);
-    display: inline-block;
-    animation: pulse 2s infinite;
+    animation: blink 2.4s ease-in-out infinite;
   }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
   }
 
-  .container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 2.5rem 1.5rem 4rem;
-  }
-
-  .hero {
+  .btn-sm {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 2rem 2rem 1.5rem;
-    margin-bottom: 2.5rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 200px; height: 200px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(200,240,100,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .hero-label {
+    border-radius: 8px;
+    color: var(--muted);
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
+    padding: 7px 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.4px;
+  }
+
+  .btn-sm:hover { color: var(--text); border-color: var(--border2); }
+
+  .btn-sm.active {
+    background: var(--accent-dim);
+    border-color: rgba(200,240,100,0.35);
     color: var(--accent);
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    width: 100%;
+    max-width: 680px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
     margin-bottom: 8px;
   }
 
-  .hero-title {
-    font-family: 'Fraunces', serif;
-    font-size: 26px;
-    font-weight: 500;
-    color: var(--text);
-    line-height: 1.2;
-    letter-spacing: -0.5px;
-    margin-bottom: 4px;
-  }
-
-  .hero-sub {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 1.5rem;
-  }
-
-  .stat-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 1.25rem;
-  }
-
-  .stat-chip {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 5px 14px;
+  .progress-count {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
     color: var(--muted);
   }
 
-  .stat-chip b { color: var(--text); font-weight: 500; }
+  .progress-count b { color: var(--text); font-weight: 500; }
 
-  .btn-submit {
-    background: var(--accent);
-    color: #0e0f11;
-    border: none;
-    border-radius: var(--radius);
-    padding: 10px 24px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-    letter-spacing: 0.2px;
-  }
-
-  .btn-submit:hover { background: var(--accent-dim); }
-  .btn-submit:active { transform: scale(0.97); }
-
-  .result-banner {
-    display: none;
-    margin-top: 1.25rem;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    padding: 1rem 1.25rem;
-    animation: fadeIn 0.3s ease;
-  }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
-  .result-score {
-    font-family: 'Fraunces', serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: -0.5px;
-  }
-
-  .result-msg {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 3px;
-  }
-
-  .section-block { margin-bottom: 2.5rem; }
-
-  .section-head {
+  .progress-stats {
     display: flex;
-    align-items: baseline;
-    gap: 10px;
-    margin-bottom: 4px;
+    gap: 12px;
   }
 
-  .section-num {
+  .stat-pill {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .stat-pill .dot-c { color: var(--correct); }
+  .stat-pill .dot-w { color: var(--wrong); }
+
+  .bar-track {
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(200,240,100,0.5), var(--accent));
+    border-radius: 99px;
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── DECK LABELS ── */
+  .deck-tabs {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+  }
+
+  .deck-tab {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.3px;
   }
 
-  .section-title {
+  .deck-tab.active {
+    background: var(--accent-dim);
+    border-color: rgba(200,240,100,0.4);
+    color: var(--accent);
+  }
+
+  .deck-tab:hover:not(.active) { color: var(--text); border-color: var(--border2); }
+
+  /* ── CARD SCENE ── */
+  .scene {
+    width: 100%;
+    max-width: 680px;
+    perspective: 1200px;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  .card-wrap {
+    position: relative;
+    width: 100%;
+    min-height: 280px;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+  }
+
+  .card-wrap.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 280px;
+  }
+
+  /* FRONT */
+  .card-front {
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .card-front .face-label {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .face-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .face-hint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .flip-icon {
+    width: 16px; height: 16px;
+    opacity: 0.5;
+  }
+
+  .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 32px 28px;
+    gap: 16px;
+  }
+
+  .section-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .section-badge::before {
+    content: '';
+    width: 22px; height: 1px;
+    background: var(--border2);
+  }
+
+  .question-text {
     font-family: 'Fraunces', serif;
     font-size: 20px;
-    font-weight: 500;
+    font-weight: 400;
+    line-height: 1.45;
     color: var(--text);
     letter-spacing: -0.3px;
   }
 
-  .section-rule {
-    height: 1px;
-    background: var(--border);
-    margin: 8px 0 10px;
-  }
-
-  .section-instr {
-    font-size: 12.5px;
-    color: var(--muted);
+  .sub-stmt {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13.5px;
+    color: var(--text);
     line-height: 1.6;
-    margin-bottom: 1.25rem;
-    background: var(--surface2);
-    border-left: 3px solid var(--accent);
-    padding: 8px 14px;
-    border-radius: 0 var(--radius) var(--radius) 0;
   }
 
-  .section-instr strong { color: var(--text); }
-
-  /* ── NEW: Definition Note Banner ── */
-  .def-note-banner {
-    background: linear-gradient(135deg, rgba(200,240,100,0.05), rgba(200,240,100,0.02));
-    border: 1px solid rgba(200,240,100,0.25);
-    border-radius: var(--radius-lg);
-    padding: 1rem 1.25rem;
-    margin-bottom: 1.5rem;
+  .sub-stmt + .sub-stmt {
+    margin-top: 6px;
   }
 
-  .def-note-title {
+  .stmt-label {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
     color: var(--accent);
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .def-note-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: rgba(200,240,100,0.2);
-  }
-
-  .def-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 8px;
-  }
-
-  .def-item {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 8px 12px;
-  }
-
-  .def-term {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    font-weight: 500;
+    margin-bottom: 4px;
     letter-spacing: 0.5px;
-    margin-bottom: 3px;
-  }
-
-  .def-body {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
-  .choices-grid {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1rem 1.25rem;
-    margin-bottom: 1.25rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 5px 16px;
-  }
-
-  .choice-item {
-    font-size: 12.5px;
-    color: var(--text);
-    line-height: 1.4;
-    display: flex;
-    gap: 6px;
-    align-items: baseline;
-  }
-
-  .choice-letter {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    font-weight: 500;
-    flex-shrink: 0;
-    min-width: 16px;
-  }
-
-  .choice-item.new-choice .choice-letter { color: #f0a0ff; }
-  .choice-item.new-choice { opacity: 0.95; }
-
-  .match-row {
-    display: grid;
-    grid-template-columns: 44px 1fr;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-
-  .answer-input {
-    width: 44px;
-    height: 40px;
-    text-align: center;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 16px;
-    font-weight: 500;
-    text-transform: uppercase;
-    background: var(--input-bg);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    color: var(--text);
-    caret-color: var(--accent);
-    transition: border-color 0.15s;
-    outline: none;
-  }
-
-  .answer-input:focus { border-color: var(--accent); }
-  .answer-input.correct { border-color: var(--correct); background: var(--correct-bg); color: var(--correct); }
-  .answer-input.wrong { border-color: var(--wrong); background: var(--wrong-bg); color: var(--wrong); }
-
-  .stmt-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 9px 13px;
-    font-size: 13px;
-    color: var(--text);
-    line-height: 1.55;
-  }
-
-  .stmt-card.new-item {
-    border-left: 3px solid rgba(240,160,255,0.4);
-  }
-
-  .item-num {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    margin-right: 6px;
-  }
-
-  .tf-row {
-    display: grid;
-    grid-template-columns: 44px 1fr;
-    gap: 10px;
-    align-items: start;
-    margin-bottom: 10px;
-  }
-
-  .tf-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-
-  .tf-stmt {
-    padding: 8px 13px;
-    font-size: 13px;
-    color: var(--text);
-    line-height: 1.55;
-    display: flex;
-    gap: 6px;
-  }
-
-  .tf-stmt + .tf-stmt {
-    border-top: 1px solid var(--border);
-    background: var(--surface2);
-  }
-
-  .stmt-tag {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--accent);
-    flex-shrink: 0;
-    padding-top: 2px;
-    letter-spacing: 0.5px;
-  }
-
-  .code-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
-    align-items: start;
-  }
-
-  @media (max-width: 600px) {
-    .code-row { grid-template-columns: 1fr; }
-    .header-meta { display: none; }
-    .def-grid { grid-template-columns: 1fr; }
-  }
-
-  .code-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .item-badge {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--accent);
   }
 
   .code-block {
-    background: var(--code-bg);
+    background: #0c0d10;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 11px 13px;
+    border-radius: 8px;
+    padding: 14px 16px;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
+    font-size: 12.5px;
     color: #c9d1d9;
     white-space: pre;
-    line-height: 1.7;
+    line-height: 1.75;
     overflow-x: auto;
   }
 
@@ -467,602 +342,771 @@
   .nu { color: #79c0ff; }
   .cm { color: #6a7282; font-style: italic; }
 
-  .output-area {
-    width: 100%;
-    min-height: 64px;
-    resize: vertical;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    background: var(--input-bg);
+  /* BACK */
+  .card-back {
+    background: #111316;
     border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    padding: 10px 12px;
-    color: var(--text);
-    line-height: 1.6;
-    transition: border-color 0.15s;
-    outline: none;
-    caret-color: var(--accent);
+    transform: rotateY(180deg);
   }
 
-  .output-area:focus { border-color: var(--accent); }
-  .output-area.correct { border-color: var(--correct); background: var(--correct-bg); }
-  .output-area.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+  .card-back .face-label {
+    background: #0e1012;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 
-  .hint-text {
+  .answer-display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 32px;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .answer-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .answer-main {
+    font-family: 'Fraunces', serif;
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+
+  .answer-main.answer-long {
+    font-size: 22px;
+    letter-spacing: -0.5px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    white-space: pre;
+    text-align: left;
+    background: #0c0d10;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    color: var(--accent);
+    line-height: 1.75;
+  }
+
+  .answer-sub {
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 480px;
+    line-height: 1.6;
+  }
+
+  /* T2 answer mapping */
+  .answer-map {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 4px;
+  }
+
+  .map-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     color: var(--muted);
-    margin-top: 4px;
-    font-style: italic;
   }
 
-  .progress-bar-wrap {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--border);
-    z-index: 200;
+  .map-chip.hl { border-color: rgba(200,240,100,0.35); color: var(--accent); background: var(--accent-dim); }
+
+  /* ── ACTIONS ROW ── */
+  .actions {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
   }
 
-  .progress-bar-fill {
-    height: 100%;
-    background: var(--accent);
-    transition: width 0.3s ease;
-    width: 0%;
-  }
-
-  .scroll-top {
-    position: fixed;
-    bottom: 20px; right: 20px;
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: var(--surface2);
-    border: 1px solid var(--border2);
+  .btn-nav {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     color: var(--muted);
-    font-size: 18px;
-    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 12px 18px;
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s;
-    text-decoration: none;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
   }
 
-  .scroll-top.visible { opacity: 1; }
-  .scroll-top:hover { color: var(--text); border-color: var(--accent); }
+  .btn-nav:hover:not(:disabled) { color: var(--text); border-color: var(--border2); }
+  .btn-nav:disabled { opacity: 0.3; cursor: default; }
 
-  .cheat-fill {
-    color: var(--accent) !important;
-    border-color: var(--accent) !important;
-    background: rgba(200,240,100,0.06) !important;
+  .btn-mark {
+    flex: 1;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 12px 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px solid;
+  }
+
+  .btn-correct {
+    background: var(--correct-bg);
+    border-color: rgba(74,222,128,0.3);
+    color: var(--correct);
+  }
+
+  .btn-correct:hover { background: rgba(74,222,128,0.1); border-color: var(--correct); }
+
+  .btn-wrong {
+    background: var(--wrong-bg);
+    border-color: rgba(248,113,113,0.3);
+    color: var(--wrong);
+  }
+
+  .btn-wrong:hover { background: rgba(248,113,113,0.1); border-color: var(--wrong); }
+
+  /* ── KEYBOARD HINT ── */
+  .kbd-hint {
+    width: 100%;
+    max-width: 680px;
+    text-align: center;
+    margin-top: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+
+  .kbd { display: inline-block; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; font-size: 10px; }
+
+  /* ── COMPLETION SCREEN ── */
+  .done-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    text-align: center;
+    padding: 40px 20px;
+    width: 100%;
+    max-width: 680px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .done-screen.visible { display: flex; }
+
+  .done-title {
+    font-family: 'Fraunces', serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -1.5px;
+    line-height: 1;
+  }
+
+  .done-sub {
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 400px;
+    line-height: 1.6;
+  }
+
+  .done-stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .done-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    text-align: center;
+  }
+
+  .done-stat-n { font-size: 28px; font-weight: 600; color: var(--text); display: block; }
+  .done-stat-l { font-size: 10px; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; margin-top: 2px; }
+
+  .btn-restart {
+    background: var(--accent);
+    color: #0e0f11;
+    border: none;
+    border-radius: var(--radius);
+    padding: 13px 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 8px;
+  }
+
+  .btn-restart:hover { opacity: 0.88; }
+
+  /* ── CARD SWIPE ANIMATION ── */
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes slideOutRight {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(40px); }
+  }
+
+  @keyframes slideOutLeft {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(-40px); }
+  }
+
+  .scene.anim-next { animation: slideInRight 0.3s cubic-bezier(.4,0,.2,1); }
+  .scene.anim-prev { animation: slideInLeft 0.3s cubic-bezier(.4,0,.2,1); }
+
+  /* ── CARD RESULT GLOW ── */
+  .card-front.marked-correct { border-color: rgba(74,222,128,0.45); box-shadow: 0 0 28px rgba(74,222,128,0.08); }
+  .card-front.marked-wrong { border-color: rgba(248,113,113,0.45); box-shadow: 0 0 28px rgba(248,113,113,0.08); }
+
+  @media (max-width: 520px) {
+    .question-text { font-size: 17px; }
+    .answer-main { font-size: 40px; }
+    .card-body { padding: 24px 20px 20px; }
+    .answer-display { padding: 24px 20px; }
   }
 </style>
 </head>
 <body>
 
-<header class="site-header">
-  <div class="header-title">Image Processing Exam</div>
-  <div class="header-meta">
-    <span><span class="dot"></span> 105 items</span>
-    <span id="hdr-answered">0 answered</span>
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <span class="logo-dot"></span>
+    Image Processing Flashcards
   </div>
-</header>
-
-<div class="progress-bar-wrap">
-  <div class="progress-bar-fill" id="prog-bar"></div>
+  <div class="header-actions">
+    <button class="btn-sm" id="btn-shuffle" onclick="shuffleDeck()">⇄ Shuffle</button>
+    <button class="btn-sm" id="btn-wrong-only" onclick="toggleWrongOnly()">Wrong only</button>
+    <button class="btn-sm" id="btn-restart-sm" onclick="restartDeck()">↺ Restart</button>
+  </div>
 </div>
 
-<a class="scroll-top" id="scroll-top" href="#top">↑</a>
-
-<div class="container" id="top">
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-label">Midterms Examination</div>
-    <div class="hero-title">Computer Vision with Python<br><em style="font-weight:300">Image Thresholding &amp; Blurring</em></div>
-    <div class="hero-sub">OpenCV · NumPy · Matplotlib · Adaptive Methods · Filtering Techniques</div>
-    <div class="stat-row">
-      <div class="stat-chip">Test 1 <b>Matching</b> — 45 pts</div>
-      <div class="stat-chip">Test 2 <b>Statements</b> — 30 pts</div>
-      <div class="stat-chip">Test 3 <b>Code Output</b> — 30 pts</div>
-    </div>
-    <button class="btn-submit" onclick="submitExam()">Submit &amp; Check Answers</button>
-    <div class="result-banner" id="result-banner">
-      <div class="result-score" id="final-score"></div>
-      <div class="result-msg" id="final-msg"></div>
+<!-- PROGRESS -->
+<div class="progress-wrap" id="progress-wrap">
+  <div class="progress-meta">
+    <div class="progress-count">Card <b id="cur-num">1</b> of <b id="total-num">—</b></div>
+    <div class="progress-stats">
+      <span class="stat-pill"><span class="dot-c">✓</span> <span id="stat-correct">0</span> correct</span>
+      <span class="stat-pill"><span class="dot-w">✗</span> <span id="stat-wrong">0</span> wrong</span>
     </div>
   </div>
+  <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+</div>
 
-  <!-- CLASSROOM NOTES REFERENCE -->
-  <div class="def-note-banner">
-    <div class="def-note-title">📋 Classroom Notes — Morphological Operators Reference</div>
-    <div class="def-grid">
-      <div class="def-item">
-        <div class="def-term">MORPHOLOGICAL OPERATORS</div>
-        <div class="def-body">Sets of kernels that achieve a variety of effects such as reducing noise. Can achieve erosion &amp; dilation effects on an existing image. Effect is most easily seen on text data.</div>
+<!-- DECK FILTER TABS -->
+<div class="deck-tabs">
+  <div class="deck-tab active" data-deck="all" onclick="filterDeck('all')">All Cards</div>
+  <div class="deck-tab" data-deck="t1" onclick="filterDeck('t1')">Test 1 — Matching</div>
+  <div class="deck-tab" data-deck="t2" onclick="filterDeck('t2')">Test 2 — Statements</div>
+  <div class="deck-tab" data-deck="t3" onclick="filterDeck('t3')">Test 3 — Code Output</div>
+</div>
+
+<!-- CARD SCENE -->
+<div class="scene" id="scene" onclick="flipCard()">
+  <div class="card-wrap" id="card-wrap">
+    <div class="card-face card-front" id="card-front">
+      <div class="face-label">
+        <span class="face-tag" id="face-tag">QUESTION</span>
+        <span class="face-hint">
+          <svg class="flip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+          tap to flip
+        </span>
       </div>
-      <div class="def-item">
-        <div class="def-term">EROSION</div>
-        <div class="def-body">Erodes away boundaries of foreground objects. Works best when foreground is light color (preferably white) and background is dark.</div>
+      <div class="card-body" id="card-body"></div>
+    </div>
+    <div class="card-face card-back" id="card-back">
+      <div class="face-label">
+        <span class="face-tag" style="color:var(--correct)">ANSWER</span>
+        <span class="face-hint">tap to flip back</span>
       </div>
-      <div class="def-item">
-        <div class="def-term">OPENING (MORPH_OPEN)</div>
-        <div class="def-body">Erosion followed by dilation. Useful in removing <em>background</em> noise (white dots on dark background).</div>
-      </div>
-      <div class="def-item">
-        <div class="def-term">CLOSING (MORPH_CLOSE)</div>
-        <div class="def-body">Useful in removing noise from <em>foreground</em> objects, such as black dots on top of white texts.</div>
-      </div>
-      <div class="def-item">
-        <div class="def-term">MORPHOLOGICAL GRADIENT</div>
-        <div class="def-body">Difference between dilation and erosion of an image — highlights object boundaries/edges.</div>
-      </div>
+      <div class="answer-display" id="answer-display"></div>
     </div>
   </div>
+</div>
 
-  <!-- TEST 1 -->
-  <div class="section-block">
-    <div class="section-head">
-      <span class="section-num">Test 01</span>
-      <span class="section-title">Matching Type</span>
+<!-- ACTION BUTTONS -->
+<div class="actions" id="action-row">
+  <button class="btn-nav" id="btn-prev" onclick="navigate(-1)" disabled>← Prev</button>
+  <button class="btn-mark btn-correct" onclick="markCard(true)">✓ Got it</button>
+  <button class="btn-mark btn-wrong" onclick="markCard(false)">✗ Missed</button>
+  <button class="btn-nav" id="btn-next" onclick="navigate(1)">Next →</button>
+</div>
+
+<!-- KEYBOARD HINTS -->
+<div class="kbd-hint">
+  <span><kbd class="kbd">Space</kbd> flip</span>
+  <span><kbd class="kbd">←</kbd> prev</span>
+  <span><kbd class="kbd">→</kbd> next</span>
+  <span><kbd class="kbd">1</kbd> got it &nbsp; <kbd class="kbd">2</kbd> missed</span>
+</div>
+
+<!-- COMPLETION SCREEN -->
+<div class="done-screen" id="done-screen">
+  <div class="done-title">Round Complete!</div>
+  <div class="done-sub">You've gone through all the cards in this session.</div>
+  <div class="done-stats">
+    <div class="done-stat">
+      <span class="done-stat-n" id="done-correct" style="color:var(--correct)">0</span>
+      <span class="done-stat-l">Correct</span>
     </div>
-    <div class="section-rule"></div>
-    <div class="section-instr">
-      Write the <strong>letter</strong> of the best matching answer in the box to the left of each statement. Letters may be used more than once. <strong>Choice U</strong> refers to the general concept of Morphological Operators.
+    <div class="done-stat">
+      <span class="done-stat-n" id="done-wrong" style="color:var(--wrong)">0</span>
+      <span class="done-stat-l">Missed</span>
     </div>
-    <div class="choices-grid" id="choices-grid"></div>
-    <div id="test1-wrap"></div>
+    <div class="done-stat">
+      <span class="done-stat-n" id="done-pct" style="color:var(--accent)">—</span>
+      <span class="done-stat-l">Score</span>
+    </div>
   </div>
-
-  <!-- TEST 2 -->
-  <div class="section-block">
-    <div class="section-head">
-      <span class="section-num">Test 02</span>
-      <span class="section-title">Statement Evaluation</span>
-    </div>
-    <div class="section-rule"></div>
-    <div class="section-instr">
-      Two statements are given per item. Write:
-      <strong>A</strong> — only Statement 1 is correct &nbsp;·&nbsp;
-      <strong>B</strong> — only Statement 2 is correct &nbsp;·&nbsp;
-      <strong>C</strong> — both are correct &nbsp;·&nbsp;
-      <strong>D</strong> — neither is correct
-    </div>
-    <div id="test2-wrap"></div>
-  </div>
-
-  <!-- TEST 3 -->
-  <div class="section-block">
-    <div class="section-head">
-      <span class="section-num">Test 03</span>
-      <span class="section-title">Code Output</span>
-    </div>
-    <div class="section-rule"></div>
-    <div class="section-instr">
-      Read each code snippet and <strong>type the expected output</strong> exactly in the box on the right. Mind spacing and data types.
-    </div>
-    <div id="test3-wrap"></div>
-  </div>
-
+  <button class="btn-restart" onclick="restartDeck()">↺ Restart Deck</button>
+  <button class="btn-sm" onclick="toggleWrongOnly()" style="margin-top:4px">Study missed cards only</button>
 </div>
 
 <script>
 /* ============================================================
-   DATA
+   RAW DATA
 ============================================================ */
-const CHOICES = [
-  {l:'A', t:'Erosion — cv2.erode()', isNew:false},
-  {l:'B', t:'Dilation — cv2.dilate()', isNew:false},
-  {l:'C', t:'Opening — cv2.MORPH_OPEN', isNew:false},
-  {l:'D', t:'Closing — cv2.MORPH_CLOSE', isNew:false},
-  {l:'E', t:'Morphological Gradient — cv2.MORPH_GRADIENT', isNew:false},
-  {l:'F', t:'Gaussian Blur — cv2.GaussianBlur()', isNew:false},
-  {l:'G', t:'Median Blur — cv2.medianBlur()', isNew:false},
-  {l:'H', t:'Averaging / Box Filter — cv2.blur()', isNew:false},
-  {l:'I', t:'Bilateral Filter — cv2.bilateralFilter()', isNew:false},
-  {l:'J', t:'Kernel / Structuring Element', isNew:false},
-  {l:'K', t:'Gamma Correction — np.power(img, gamma)', isNew:false},
-  {l:'L', t:'White Noise', isNew:false},
-  {l:'M', t:'Black Noise', isNew:false},
-  {l:'N', t:'cv2.filter2D()', isNew:false},
-  {l:'O', t:'np.zeros()', isNew:false},
-  {l:'P', t:'cv2.FONT_HERSHEY_SIMPLEX', isNew:false},
-  {l:'Q', t:'cv2.putText()', isNew:false},
-  {l:'R', t:'np.ones() / 25 kernel', isNew:false},
-  {l:'S', t:'cv2.COLOR_BGR2RGB', isNew:false},
-  {l:'T', t:'Pixel value > T → 255 (White) — Binary Threshold rule', isNew:false},
-  // ── NEW from classroom notes ──
-  {l:'U', t:'Morphological Operators — sets of kernels for noise reduction & shape operations', isNew:true},
+const CHOICES_MAP = {
+  A:'Erosion — cv2.erode()',
+  B:'Dilation — cv2.dilate()',
+  C:'Opening — cv2.MORPH_OPEN',
+  D:'Closing — cv2.MORPH_CLOSE',
+  E:'Morphological Gradient — cv2.MORPH_GRADIENT',
+  F:'Gaussian Blur — cv2.GaussianBlur()',
+  G:'Median Blur — cv2.medianBlur()',
+  H:'Averaging / Box Filter — cv2.blur()',
+  I:'Bilateral Filter — cv2.bilateralFilter()',
+  J:'Kernel / Structuring Element',
+  K:'Gamma Correction — np.power(img, gamma)',
+  L:'White Noise',
+  M:'Black Noise',
+  N:'cv2.filter2D()',
+  O:'np.zeros()',
+  P:'cv2.FONT_HERSHEY_SIMPLEX',
+  Q:'cv2.putText()',
+  R:'np.ones() / 25 kernel',
+  S:'cv2.COLOR_BGR2RGB',
+  T:'Pixel value > T → 255 (White) — Binary Threshold rule',
+  U:'Morphological Operators — sets of kernels for noise reduction & shape operations',
+};
+
+const T2_LABELS = {
+  A:'Only Statement 1 is correct',
+  B:'Only Statement 2 is correct',
+  C:'Both statements are correct',
+  D:'Neither statement is correct',
+};
+
+const RAW_T1 = [
+  {q:'Shrinks bright regions; removes small white noise from a foreground image.',a:'A'},
+  {q:'Grows bright regions; fills small holes in foreground objects.',a:'B'},
+  {q:'Erosion followed by dilation — removes white (foreground) noise.',a:'C'},
+  {q:'Dilation followed by erosion — removes black (background) noise / fills gaps.',a:'D'},
+  {q:'The difference between dilation and erosion of an image; highlights edges.',a:'E'},
+  {q:'The structuring element (matrix of ones) passed to cv2.erode() and cv2.dilate().',a:'J'},
+  {q:'Used in the morphological operators notebook to create a 600×600 blank canvas with np.zeros().',a:'O'},
+  {q:'The OpenCV function used to draw "GAB T." text on the blank image in the morphology notebook.',a:'Q'},
+  {q:'The default font constant used with cv2.putText() in the morphology demo.',a:'P'},
+  {q:'Random binary array scaled to 255, added to the image to simulate foreground speckle noise.',a:'L'},
+  {q:'Power-law operation applied as np.power(img, gamma); brightens when gamma < 1.',a:'K'},
+  {q:'When gamma = 1/4 is used in np.power(img, gamma), this transformation brightens the image.',a:'K'},
+  {q:'When gamma = 8 is used in np.power(img, gamma), this transformation darkens the image.',a:'K'},
+  {q:'The color conversion flag used to go from OpenCV BGR order to Matplotlib-compatible RGB.',a:'S'},
+  {q:'The OpenCV function used to apply a custom 5×5 averaging kernel to an image via convolution.',a:'N'},
+  {q:'A 5×5 matrix of ones divided by 25 — used as a normalized averaging kernel in the quiz.',a:'R'},
+  {q:'Blur achieved by passing ksize=(5,5) to cv2.blur() — used in the tong midterms quiz.',a:'H'},
+  {q:'Blur that uses a weighted average where center pixels contribute more than neighbors.',a:'F'},
+  {q:'Most effective blur for salt-and-pepper noise; uses the middle value of the neighborhood.',a:'G'},
+  {q:'Edge-preserving smoothing; considers both spatial distance and pixel intensity differences.',a:'I'},
+  {q:'Random binary array scaled to -255, then clipped to 0, to simulate black speckle noise on white text.',a:'M'},
+  {q:'The operation that, with iterations=4, causes the text "GAB T." to visibly thin and shrink.',a:'A'},
+  {q:'The operation that, applied to a noisy image with white dots, uses MORPH_OPEN to clean it.',a:'C'},
+  {q:'The operation applied to black_noise_img using MORPH_CLOSE to restore white text regions.',a:'D'},
+  {q:'Highlights the outline/boundary of objects by computing dilation minus erosion.',a:'E'},
+  {q:'The function that loads bricks.jpg and normalizes pixel values to the range [0.0, 1.0].',a:'S'},
+  {q:'np.zeros((600,600)) creates this type of image — used as a blank canvas in the morphology notebook.',a:'O'},
+  {q:'The OpenCV function used to convolve an image with a custom kernel (not a named blur function).',a:'N'},
+  {q:'A 5×5 kernel where all values equal 1/25; equivalent to a box/averaging blur.',a:'R'},
+  {q:'The conversion applied as img.astype(np.float32) / 255 normalizes pixel range for this.',a:'K'},
+  {q:'Blur function used as cv2.blur(img, ksize=(5,5)) in the tong midterms quiz notebook.',a:'H'},
+  {q:"The flag passed to cv2.cvtColor() to fix OpenCV's BGR channel order for Matplotlib display.",a:'S'},
+  {q:'Structuring element created with np.ones((5,5), np.uint8) used in erosion and dilation.',a:'J'},
+  {q:'The morphological operation that produces the image boundary by subtracting erosion from dilation.',a:'E'},
+  {q:'A gamma value less than 1 applied via np.power() results in this type of image transformation.',a:'K'},
+  {q:'The noise type added using white_noise * 255 + img in the morphological operators notebook.',a:'L'},
+  {q:'The noise type created using black_noise * -255, then clipping -255 to 0.',a:'M'},
+  {q:'Applying cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel) removes this type of noise.',a:'L'},
+  {q:'Applying cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel) fills holes caused by this noise type.',a:'M'},
+  {q:'The binary threshold rule: if pixel > T, output becomes 255 (white).',a:'T'},
+  {q:'[CLASS NOTES] "Sets of kernels that can achieve a variety of effects such as reducing noise" — this describes which general concept?',a:'U'},
+  {q:'[CLASS NOTES] Erodes away boundaries of foreground objects; works best when foreground is light color (preferably white) and background is dark.',a:'A'},
+  {q:'[CLASS NOTES] "Opening is erosion followed by dilation. Useful in removing background noise!" — this matches which operation?',a:'C'},
+  {q:'[CLASS NOTES] "Useful in removing noise from foreground objects, such as black dots on top of white texts." — this matches which operation?',a:'D'},
+  {q:'[CLASS NOTES] "Difference between dilation and erosion of an image" — this is the classroom definition of which morphological operation?',a:'E'},
 ];
 
-const T1 = [
-  // Morphological operators — from morphological_operators.py
-  {q:'Shrinks bright regions; removes small white noise from a foreground image.', a:'A'},
-  {q:'Grows bright regions; fills small holes in foreground objects.', a:'B'},
-  {q:'Erosion followed by dilation — removes white (foreground) noise.', a:'C'},
-  {q:'Dilation followed by erosion — removes black (background) noise / fills gaps.', a:'D'},
-  {q:'The difference between dilation and erosion of an image; highlights edges.', a:'E'},
-  {q:'The structuring element (matrix of ones) passed to cv2.erode() and cv2.dilate().', a:'J'},
-  {q:'Used in the morphological operators notebook to create a 600×600 blank canvas with np.zeros().', a:'O'},
-  {q:'The OpenCV function used to draw "GAB T." text on the blank image in the morphology notebook.', a:'Q'},
-  {q:'The default font constant used with cv2.putText() in the morphology demo.', a:'P'},
-  {q:'Random binary array scaled to 255, added to the image to simulate foreground speckle noise.', a:'L'},
-  // Gamma
-  {q:'Power-law operation applied as np.power(img, gamma); brightens when gamma < 1.', a:'K'},
-  {q:'When gamma = 1/4 is used in np.power(img, gamma), this transformation brightens the image.', a:'K'},
-  {q:'When gamma = 8 is used in np.power(img, gamma), this transformation darkens the image.', a:'K'},
-  {q:'The color conversion flag used to go from OpenCV BGR order to Matplotlib-compatible RGB.', a:'S'},
-  // Blurring
-  {q:'The OpenCV function used to apply a custom 5×5 averaging kernel to an image via convolution.', a:'N'},
-  {q:'A 5×5 matrix of ones divided by 25 — used as a normalized averaging kernel in the quiz.', a:'R'},
-  {q:'Blur achieved by passing ksize=(5,5) to cv2.blur() — used in the tong midterms quiz.', a:'H'},
-  {q:'Blur that uses a weighted average where center pixels contribute more than neighbors.', a:'F'},
-  {q:'Most effective blur for salt-and-pepper noise; uses the middle value of the neighborhood.', a:'G'},
-  {q:'Edge-preserving smoothing; considers both spatial distance and pixel intensity differences.', a:'I'},
-  // Mixed
-  {q:'Random binary array scaled to -255, then clipped to 0, to simulate black speckle noise on white text.', a:'M'},
-  {q:'The operation that, with iterations=4, causes the text "GAB T." to visibly thin and shrink.', a:'A'},
-  {q:'The operation that, applied to a noisy image with white dots, uses MORPH_OPEN to clean it.', a:'C'},
-  {q:'The operation applied to black_noise_img using MORPH_CLOSE to restore white text regions.', a:'D'},
-  {q:'Highlights the outline/boundary of objects by computing dilation minus erosion.', a:'E'},
-  {q:'The function that loads bricks.jpg and normalizes pixel values to the range [0.0, 1.0].', a:'S'},
-  {q:'np.zeros((600,600)) creates this type of image — used as a blank canvas in the morphology notebook.', a:'O'},
-  {q:'The OpenCV function used to convolve an image with a custom kernel (not a named blur function).', a:'N'},
-  {q:'A 5×5 kernel where all values equal 1/25; equivalent to a box/averaging blur.', a:'R'},
-  {q:'The conversion applied as img.astype(np.float32) / 255 normalizes pixel range for this.', a:'K'},
-  {q:'Blur function used as cv2.blur(img, ksize=(5,5)) in the tong midterms quiz notebook.', a:'H'},
-  {q:'The flag passed to cv2.cvtColor() to fix OpenCV\'s BGR channel order for Matplotlib display.', a:'S'},
-  {q:'Structuring element created with np.ones((5,5), np.uint8) used in erosion and dilation.', a:'J'},
-  {q:'The morphological operation that produces the image boundary by subtracting erosion from dilation.', a:'E'},
-  {q:'A gamma value less than 1 applied via np.power() results in this type of image transformation.', a:'K'},
-  {q:'The noise type added using white_noise * 255 + img in the morphological operators notebook.', a:'L'},
-  {q:'The noise type created using black_noise * -255, then clipping -255 to 0.', a:'M'},
-  {q:'Applying cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel) removes this type of noise.', a:'L'},
-  {q:'Applying cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel) fills holes caused by this noise type.', a:'M'},
-  {q:'The binary threshold rule: if pixel > T, output becomes 255 (white).', a:'T'},
-  // ── NEW items from classroom notes ──────────────────────────────
-  {q:'[CLASS NOTES] "Sets of kernels that can achieve a variety of effects such as reducing noise" — this describes which general concept?', a:'U', isNew:true},
-  {q:'[CLASS NOTES] Erodes away boundaries of foreground objects; works best when foreground is light color (preferably white) and background is dark.', a:'A', isNew:true},
-  {q:'[CLASS NOTES] "OPening is erosion followed by dilation. Useful in removing background noise!" — this matches which operation?', a:'C', isNew:true},
-  {q:'[CLASS NOTES] "Useful in removing noise from foreground objects, such as black dots on top of white texts." — this matches which operation?', a:'D', isNew:true},
-  {q:'[CLASS NOTES] "Difference between dilation and erosion of an image" — this is the classroom definition of which morphological operation?', a:'E', isNew:true},
+const RAW_T2 = [
+  {s1:"Erosion shrinks bright (foreground) regions in a binary image.",s2:"Dilation also shrinks bright regions by removing pixels from boundaries.",ans:'A'},
+  {s1:"cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel) applies erosion then dilation.",s2:"Opening is used to remove small white noise dots from a bright foreground.",ans:'C'},
+  {s1:"cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel) applies dilation then erosion.",s2:"Closing is used to fill small dark holes or gaps in a bright foreground.",ans:'C'},
+  {s1:"The morphological gradient is computed as dilation minus erosion of an image.",s2:"The morphological gradient produces a blurred, smooth version of the image.",ans:'A'},
+  {s1:"In the morphology notebook, white noise is created as np.random.randint(0, 2, (600,600)) * 255.",s2:"Adding this white noise array to the image introduces random black dot artifacts.",ans:'A'},
+  {s1:"Black noise is created by multiplying a binary random array by -255 and clipping -255 values to 0.",s2:"Black noise introduces random white dot artifacts into the image.",ans:'A'},
+  {s1:"Increasing the iterations parameter in cv2.erode() produces a stronger erosion effect.",s2:"Using iterations=4 in cv2.erode() erodes less than using iterations=1.",ans:'A'},
+  {s1:"np.ones((5,5), np.uint8) creates a 5×5 structuring element of all ones.",s2:"The dtype of the structuring element must always be np.float32 for morphological operations.",ans:'A'},
+  {s1:"Applying np.power(img, 1/4) brightens the image because gamma < 1 expands dark pixel values.",s2:"Applying np.power(img, 8) also brightens the image.",ans:'A'},
+  {s1:"Gamma correction using np.power() requires the image pixels to be normalized to [0.0, 1.0] first.",s2:"If pixels are in the range [0, 255], np.power(img, 0.5) will still produce correct gamma output.",ans:'A'},
+  {s1:"img.astype(np.float32) / 255 converts pixel values from [0,255] to [0.0,1.0].",s2:"This normalization step is needed before applying gamma correction with np.power().",ans:'C'},
+  {s1:"cv2.cvtColor(img, cv2.COLOR_BGR2RGB) reorders color channels for correct Matplotlib display.",s2:"OpenCV loads images in RGB order by default.",ans:'A'},
+  {s1:"cv2.filter2D(img, -1, kernel) applies a custom convolution kernel to an image.",s2:"The -1 in cv2.filter2D means the output depth matches the input image depth.",ans:'C'},
+  {s1:"A 5×5 kernel of np.ones((5,5), np.float32)/25 is mathematically equivalent to cv2.blur() with ksize=(5,5).",s2:"cv2.filter2D() with this kernel produces a different result than cv2.blur() with ksize=(5,5).",ans:'A'},
+  {s1:"cv2.blur(img, ksize=(5,5)) and cv2.filter2D(img, -1, np.ones((5,5))/25) produce the same averaging effect.",s2:"cv2.blur() internally uses a normalized box filter.",ans:'C'},
+  {s1:"cv2.GaussianBlur() requires kernel dimensions to be odd numbers.",s2:"cv2.medianBlur() also requires an odd kernel size.",ans:'C'},
+  {s1:"cv2.medianBlur() replaces each pixel with the mean (average) of its neighborhood.",s2:"cv2.medianBlur() is the best filter for removing salt-and-pepper noise.",ans:'B'},
+  {s1:"Bilateral filtering smooths an image while preserving edges.",s2:"Bilateral filtering is faster than Gaussian blur.",ans:'A'},
+  {s1:"In the tong midterms quiz, cv2.putText() draws red text because color=(255,0,0) in BGR means red.",s2:"In BGR format, color=(255,0,0) represents blue.",ans:'B'},
+  {s1:"cv2.putText() with color=(255,0,0) on a float32 image loaded via cv2.imread draws red text.",s2:"After converting with COLOR_BGR2RGB, the same (255,0,0) values appear as blue in Matplotlib.",ans:'A'},
+  {s1:"cv2.threshold() returns two values: the threshold level and the thresholded image.",s2:"When using Otsu's method, you do not pass a manual threshold value.",ans:'C'},
+  {s1:"Adaptive thresholding uses a single fixed threshold for the entire image.",s2:"Adaptive thresholding is better than simple thresholding under non-uniform lighting.",ans:'B'},
+  {s1:"Otsu's thresholding works best on images with clearly bimodal histograms.",s2:"Otsu's method can be applied directly to color (BGR) images without conversion.",ans:'A'},
+  {s1:"Simple thresholding performs poorly on images with spatially varying illumination.",s2:"Adaptive thresholding was designed specifically to handle images with varying illumination.",ans:'C'},
+  {s1:"In THRESH_TOZERO, pixels above the threshold remain unchanged.",s2:"In THRESH_TOZERO_INV, pixels above the threshold are set to 0.",ans:'C'},
+  {s1:"np.zeros((600,600)) creates a 600×600 array filled with zeros, representing a black image.",s2:"np.zeros() requires an explicit dtype argument; it cannot infer the type automatically.",ans:'A'},
+  {s1:"white_noise = np.random.randint(low=0, high=2, size=(600,600)) produces values of only 0 or 1.",s2:"Multiplying white_noise by 255 produces an array containing only 0 or 255.",ans:'C'},
+  {s1:"black_noise = np.random.randint(0,2,(600,600)) * -255 produces values of 0 or -255.",s2:"After setting black_noise_img[black_noise_img==-255]=0, negative values become white (255).",ans:'A'},
+  {s1:"Morphological Opening (MORPH_OPEN) removes foreground white noise added to a binary image.",s2:"Morphological Closing (MORPH_CLOSE) also removes foreground white noise.",ans:'A'},
+  {s1:"Image thresholding is a fundamental form of image segmentation.",s2:"Image segmentation always requires a machine learning model.",ans:'A'},
 ];
 
-const T2 = [
-  {s1:"Erosion shrinks bright (foreground) regions in a binary image.",
-   s2:"Dilation also shrinks bright regions by removing pixels from boundaries.", ans:'A'},
-  {s1:"cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel) applies erosion then dilation.",
-   s2:"Opening is used to remove small white noise dots from a bright foreground.", ans:'C'},
-  {s1:"cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel) applies dilation then erosion.",
-   s2:"Closing is used to fill small dark holes or gaps in a bright foreground.", ans:'C'},
-  {s1:"The morphological gradient is computed as dilation minus erosion of an image.",
-   s2:"The morphological gradient produces a blurred, smooth version of the image.", ans:'A'},
-  {s1:"In the morphology notebook, white noise is created as np.random.randint(0, 2, (600,600)) * 255.",
-   s2:"Adding this white noise array to the image introduces random black dot artifacts.", ans:'A'},
-  {s1:"Black noise is created by multiplying a binary random array by -255 and clipping -255 values to 0.",
-   s2:"Black noise introduces random white dot artifacts into the image.", ans:'A'},
-  {s1:"Increasing the iterations parameter in cv2.erode() produces a stronger erosion effect.",
-   s2:"Using iterations=4 in cv2.erode() erodes less than using iterations=1.", ans:'A'},
-  {s1:"np.ones((5,5), np.uint8) creates a 5×5 structuring element of all ones.",
-   s2:"The dtype of the structuring element must always be np.float32 for morphological operations.", ans:'A'},
-  {s1:"Applying np.power(img, 1/4) brightens the image because gamma < 1 expands dark pixel values.",
-   s2:"Applying np.power(img, 8) also brightens the image.", ans:'A'},
-  {s1:"Gamma correction using np.power() requires the image pixels to be normalized to [0.0, 1.0] first.",
-   s2:"If pixels are in the range [0, 255], np.power(img, 0.5) will still produce correct gamma output.", ans:'A'},
-  {s1:"img.astype(np.float32) / 255 converts pixel values from [0,255] to [0.0,1.0].",
-   s2:"This normalization step is needed before applying gamma correction with np.power().", ans:'C'},
-  {s1:"cv2.cvtColor(img, cv2.COLOR_BGR2RGB) reorders color channels for correct Matplotlib display.",
-   s2:"OpenCV loads images in RGB order by default.", ans:'A'},
-  {s1:"cv2.filter2D(img, -1, kernel) applies a custom convolution kernel to an image.",
-   s2:"The -1 in cv2.filter2D means the output depth matches the input image depth.", ans:'C'},
-  {s1:"A 5×5 kernel of np.ones((5,5), np.float32)/25 is mathematically equivalent to cv2.blur() with ksize=(5,5).",
-   s2:"cv2.filter2D() with this kernel produces a different result than cv2.blur() with ksize=(5,5).", ans:'A'},
-  {s1:"cv2.blur(img, ksize=(5,5)) and cv2.filter2D(img, -1, np.ones((5,5))/25) produce the same averaging effect.",
-   s2:"cv2.blur() internally uses a normalized box filter.", ans:'C'},
-  {s1:"cv2.GaussianBlur() requires kernel dimensions to be odd numbers.",
-   s2:"cv2.medianBlur() also requires an odd kernel size.", ans:'C'},
-  {s1:"cv2.medianBlur() replaces each pixel with the mean (average) of its neighborhood.",
-   s2:"cv2.medianBlur() is the best filter for removing salt-and-pepper noise.", ans:'B'},
-  {s1:"Bilateral filtering smooths an image while preserving edges.",
-   s2:"Bilateral filtering is faster than Gaussian blur.", ans:'A'},
-  {s1:"In the tong midterms quiz, cv2.putText() draws red text because color=(255,0,0) in BGR means red.",
-   s2:"In BGR format, color=(255,0,0) represents blue.", ans:'B'},
-  {s1:"cv2.putText() with color=(255,0,0) on a float32 image loaded via cv2.imread draws red text.",
-   s2:"After converting with COLOR_BGR2RGB, the same (255,0,0) values appear as blue in Matplotlib.", ans:'A'},
-  {s1:"cv2.threshold() returns two values: the threshold level and the thresholded image.",
-   s2:"When using Otsu's method, you do not pass a manual threshold value.", ans:'C'},
-  {s1:"Adaptive thresholding uses a single fixed threshold for the entire image.",
-   s2:"Adaptive thresholding is better than simple thresholding under non-uniform lighting.", ans:'B'},
-  {s1:"Otsu's thresholding works best on images with clearly bimodal histograms.",
-   s2:"Otsu's method can be applied directly to color (BGR) images without conversion.", ans:'A'},
-  {s1:"Simple thresholding performs poorly on images with spatially varying illumination.",
-   s2:"Adaptive thresholding was designed specifically to handle images with varying illumination.", ans:'C'},
-  {s1:"In THRESH_TOZERO, pixels above the threshold remain unchanged.",
-   s2:"In THRESH_TOZERO_INV, pixels above the threshold are set to 0.", ans:'C'},
-  {s1:"np.zeros((600,600)) creates a 600×600 array filled with zeros, representing a black image.",
-   s2:"np.zeros() requires an explicit dtype argument; it cannot infer the type automatically.", ans:'A'},
-  {s1:"white_noise = np.random.randint(low=0, high=2, size=(600,600)) produces values of only 0 or 1.",
-   s2:"Multiplying white_noise by 255 produces an array containing only 0 or 255.", ans:'C'},
-  {s1:"black_noise = np.random.randint(0,2,(600,600)) * -255 produces values of 0 or -255.",
-   s2:"After setting black_noise_img[black_noise_img==-255]=0, negative values become white (255).", ans:'A'},
-  {s1:"Morphological Opening (MORPH_OPEN) removes foreground white noise added to a binary image.",
-   s2:"Morphological Closing (MORPH_CLOSE) also removes foreground white noise.", ans:'A'},
-  {s1:"Image thresholding is a fundamental form of image segmentation.",
-   s2:"Image segmentation always requires a machine learning model.", ans:'A'},
+const RAW_T3 = [
+  {code:`import numpy as np\nblank = np.zeros((600,600))\nprint(blank.shape)`,answer:`(600, 600)`,hint:'np.zeros((600,600)) produces a 2D array of that shape'},
+  {code:`import numpy as np\nblank = np.zeros((600,600))\nprint(blank.dtype)`,answer:`float64`,hint:'np.zeros() default dtype is float64'},
+  {code:`import numpy as np\nkernel = np.ones((5,5), np.uint8)\nprint(kernel.shape)`,answer:`(5, 5)`,hint:'Structuring element shape matches the given tuple'},
+  {code:`import numpy as np\nkernel = np.ones((5,5), np.uint8)\nprint(kernel.sum())`,answer:`25`,hint:'5×5 matrix of ones sums to 25'},
+  {code:`import numpy as np\nwn = np.random.randint(\n  low=0, high=2, size=(4,4))\nprint(wn.max())`,answer:`1`,hint:'randint(0,2) produces 0 or 1; max is 1'},
+  {code:`import numpy as np\nwn = np.random.randint(0,2,(3,3))\nwn = wn * 255\nprint(wn.dtype)`,answer:`int64`,hint:'Multiplying int array by int keeps int64 (not uint8)'},
+  {code:`import numpy as np\nbn = np.random.randint(0,2,(3,3))\nbn = bn * -255\nprint(bn.min())`,answer:`-255`,hint:'Binary array × -255 gives values 0 or -255; min is -255'},
+  {code:`import cv2\nprint(cv2.MORPH_OPEN)`,answer:`2`,hint:'Integer constant value of cv2.MORPH_OPEN'},
+  {code:`import cv2\nprint(cv2.MORPH_CLOSE)`,answer:`3`,hint:'Integer constant value of cv2.MORPH_CLOSE'},
+  {code:`import cv2\nprint(cv2.MORPH_GRADIENT)`,answer:`4`,hint:'Integer constant value of cv2.MORPH_GRADIENT'},
+  {code:`import numpy as np\nimg = np.array([0.0, 0.5, 1.0])\ngamma = 1/4\nresult = np.power(img, gamma)\nprint(result.round(4))`,answer:`[0.     0.8409 1.    ]`,hint:'0^0.25=0, 0.5^0.25≈0.8409, 1^0.25=1'},
+  {code:`import numpy as np\nimg = np.array([0.0, 0.5, 1.0])\ngamma = 8\nresult = np.power(img, gamma)\nprint(result.round(4))`,answer:`[0.     0.0039 1.    ]`,hint:'0^8=0, 0.5^8=0.00390625≈0.0039, 1^8=1'},
+  {code:`import numpy as np\nimg = np.array([128], dtype=np.uint8)\nnorm = img.astype(np.float32) / 255\nprint(round(float(norm[0]), 4))`,answer:`0.502`,hint:'128/255 ≈ 0.50196... rounds to 0.502'},
+  {code:`import cv2\nprint(cv2.COLOR_BGR2RGB)`,answer:`4`,hint:'Integer value of the COLOR_BGR2RGB flag'},
+  {code:`import numpy as np\nkernel = np.ones(\n  shape=(5,5),\n  dtype=np.float32)/25\nprint(round(kernel.sum(), 4))`,answer:`1.0`,hint:'25 elements each 1/25 — sums to 1.0'},
+  {code:`import numpy as np\nk = np.ones((5,5),np.float32)/25\nprint(round(k[2][2], 6))`,answer:`0.04`,hint:'Every element in the kernel equals 1/25 = 0.04'},
+  {code:`import cv2\nprint(cv2.FONT_HERSHEY_SIMPLEX)`,answer:`0`,hint:'Integer value of FONT_HERSHEY_SIMPLEX constant'},
+  {code:`import cv2\nprint(cv2.FONT_HERSHEY_COMPLEX)`,answer:`3`,hint:'Integer value of FONT_HERSHEY_COMPLEX constant'},
+  {code:`import numpy as np\nimg = np.array([\n  [80,80,200],\n  [80,80,80],\n  [200,80,80]\n])\nprint(img[0,2])`,answer:`200`,hint:'Row 0, column 2 of the array is 200'},
+  {code:`import numpy as np\nimg = np.array([\n  [80,80,200],\n  [80,80,80],\n  [200,80,80]\n])\nprint(img.shape)`,answer:`(3, 3)`,hint:'3 rows, 3 columns'},
+  {code:`import cv2, numpy as np\npx = np.array([[50,200],\n              [10,130]],\n              dtype=np.uint8)\nret,t = cv2.threshold(\n  px,127,255,cv2.THRESH_BINARY)\nprint(t)`,answer:`[[  0 255]\n [  0 255]]`,hint:'50<127→0, 200>127→255, 10<127→0, 130>127→255'},
+  {code:`import cv2, numpy as np\npx = np.array([[50,200]],\n              dtype=np.uint8)\nret,t = cv2.threshold(\n  px,100,255,cv2.THRESH_TRUNC)\nprint(t)`,answer:`[[ 50 100]]`,hint:'TRUNC: above T→T, below unchanged'},
+  {code:`import cv2, numpy as np\npx = np.array([[50,200]],\n              dtype=np.uint8)\nret,t = cv2.threshold(\n  px,100,255,cv2.THRESH_TOZERO)\nprint(t)`,answer:`[[  0 200]]`,hint:'TOZERO: below T→0, above unchanged'},
+  {code:`import cv2\nprint(cv2.THRESH_BINARY)`,answer:`0`,hint:'Integer constant of the flag'},
+  {code:`import cv2\nprint(cv2.THRESH_OTSU)`,answer:`8`,hint:'Integer flag value for THRESH_OTSU'},
+  {code:`import cv2\nprint(cv2.ADAPTIVE_THRESH_MEAN_C)`,answer:`0`,hint:'Integer value of ADAPTIVE_THRESH_MEAN_C'},
+  {code:`import numpy as np\nk = np.ones((3,3),np.float32) / 9\nprint(k.sum())`,answer:`1.0`,hint:'Normalized kernel: 9 × (1/9) = 1.0'},
+  {code:`import cv2\nimg = cv2.imread('i.jpg', 0)\nb = cv2.GaussianBlur(img,(3,3),0)\nprint(b.ndim)`,answer:`2`,hint:'Grayscale is a 2D array (H×W)'},
+  {code:`import numpy as np\narr = np.array([0,255,0,255,0],\n               dtype=np.uint8)\nprint(int(np.mean(arr)))`,answer:`102`,hint:'(0+255+0+255+0)/5 = 102'},
+  {code:`import numpy as np\nimg = np.array([0.5])\ngamma = 1/4\nprint(round(float(np.power(img,gamma)),4))`,answer:`0.8409`,hint:'0.5^0.25 = 0.84089...'},
 ];
-
-const T3 = [
-  {code:`import numpy as np\nblank = np.zeros((600,600))\nprint(blank.shape)`, answer:`(600, 600)`, hint:'np.zeros((600,600)) produces a 2D array of that shape'},
-  {code:`import numpy as np\nblank = np.zeros((600,600))\nprint(blank.dtype)`, answer:`float64`, hint:'np.zeros() default dtype is float64'},
-  {code:`import numpy as np\nkernel = np.ones((5,5), np.uint8)\nprint(kernel.shape)`, answer:`(5, 5)`, hint:'Structuring element shape matches the given tuple'},
-  {code:`import numpy as np\nkernel = np.ones((5,5), np.uint8)\nprint(kernel.sum())`, answer:`25`, hint:'5×5 matrix of ones sums to 25'},
-  {code:`import numpy as np\nwn = np.random.randint(\n  low=0, high=2, size=(4,4))\nprint(wn.max())`, answer:`1`, hint:'randint(0,2) produces 0 or 1; max is 1'},
-  {code:`import numpy as np\nwn = np.random.randint(0,2,(3,3))\nwn = wn * 255\nprint(wn.dtype)`, answer:`int64`, hint:'Multiplying int array by int keeps int64 (not uint8)'},
-  {code:`import numpy as np\nbn = np.random.randint(0,2,(3,3))\nbn = bn * -255\nprint(bn.min())`, answer:`-255`, hint:'Binary array × -255 gives values 0 or -255; min is -255'},
-  {code:`import cv2\nprint(cv2.MORPH_OPEN)`, answer:`2`, hint:'Integer constant value of cv2.MORPH_OPEN'},
-  {code:`import cv2\nprint(cv2.MORPH_CLOSE)`, answer:`3`, hint:'Integer constant value of cv2.MORPH_CLOSE'},
-  {code:`import cv2\nprint(cv2.MORPH_GRADIENT)`, answer:`4`, hint:'Integer constant value of cv2.MORPH_GRADIENT'},
-  {code:`import numpy as np\nimg = np.array([0.0, 0.5, 1.0])\ngamma = 1/4\nresult = np.power(img, gamma)\nprint(result.round(4))`, answer:`[0.     0.8409 1.    ]`, hint:'0^0.25=0, 0.5^0.25≈0.8409, 1^0.25=1'},
-  {code:`import numpy as np\nimg = np.array([0.0, 0.5, 1.0])\ngamma = 8\nresult = np.power(img, gamma)\nprint(result.round(4))`, answer:`[0.     0.0039 1.    ]`, hint:'0^8=0, 0.5^8=0.00390625≈0.0039, 1^8=1'},
-  {code:`import numpy as np\nimg = np.array([128], dtype=np.uint8)\nnorm = img.astype(np.float32) / 255\nprint(round(float(norm[0]), 4))`, answer:`0.502`, hint:'128/255 ≈ 0.50196... rounds to 0.502'},
-  {code:`import cv2\nprint(cv2.COLOR_BGR2RGB)`, answer:`4`, hint:'Integer value of the COLOR_BGR2RGB flag'},
-  {code:`import numpy as np\nkernel = np.ones(\n  shape=(5,5),\n  dtype=np.float32)/25\nprint(round(kernel.sum(), 4))`, answer:`1.0`, hint:'25 elements each 1/25 — sums to 1.0'},
-  {code:`import numpy as np\nk = np.ones((5,5),np.float32)/25\nprint(round(k[2][2], 6))`, answer:`0.04`, hint:'Every element in the kernel equals 1/25 = 0.04'},
-  {code:`import cv2\nprint(cv2.FONT_HERSHEY_SIMPLEX)`, answer:`0`, hint:'Integer value of FONT_HERSHEY_SIMPLEX constant'},
-  {code:`import cv2\nprint(cv2.FONT_HERSHEY_COMPLEX)`, answer:`3`, hint:'Integer value of FONT_HERSHEY_COMPLEX constant'},
-  {code:`import numpy as np\nimg = np.array([\n  [80,80,200],\n  [80,80,80],\n  [200,80,80]\n])\nprint(img[0,2])`, answer:`200`, hint:'Row 0, column 2 of the array is 200'},
-  {code:`import numpy as np\nimg = np.array([\n  [80,80,200],\n  [80,80,80],\n  [200,80,80]\n])\nprint(img.shape)`, answer:`(3, 3)`, hint:'3 rows, 3 columns'},
-  {code:`import cv2, numpy as np\npx = np.array([[50,200],\n              [10,130]],\n              dtype=np.uint8)\nret,t = cv2.threshold(\n  px,127,255,cv2.THRESH_BINARY)\nprint(t)`, answer:`[[  0 255]\n [  0 255]]`, hint:'50<127→0, 200>127→255, 10<127→0, 130>127→255'},
-  {code:`import cv2, numpy as np\npx = np.array([[50,200]],\n              dtype=np.uint8)\nret,t = cv2.threshold(\n  px,100,255,cv2.THRESH_TRUNC)\nprint(t)`, answer:`[[ 50 100]]`, hint:'TRUNC: above T→T, below unchanged'},
-  {code:`import cv2, numpy as np\npx = np.array([[50,200]],\n              dtype=np.uint8)\nret,t = cv2.threshold(\n  px,100,255,cv2.THRESH_TOZERO)\nprint(t)`, answer:`[[  0 200]]`, hint:'TOZERO: below T→0, above unchanged'},
-  {code:`import cv2\nprint(cv2.THRESH_BINARY)`, answer:`0`, hint:'Integer constant of the flag'},
-  {code:`import cv2\nprint(cv2.THRESH_OTSU)`, answer:`8`, hint:'Integer flag value for THRESH_OTSU'},
-  {code:`import cv2\nprint(cv2.ADAPTIVE_THRESH_MEAN_C)`, answer:`0`, hint:'Integer value of ADAPTIVE_THRESH_MEAN_C'},
-  {code:`import numpy as np\nk = np.ones((3,3),np.float32) / 9\nprint(k.sum())`, answer:`1.0`, hint:'Normalized kernel: 9 × (1/9) = 1.0'},
-  {code:`import cv2\nimg = cv2.imread('i.jpg', 0)\nb = cv2.GaussianBlur(img,(3,3),0)\nprint(b.ndim)`, answer:`2`, hint:'Grayscale is a 2D array (H×W)'},
-  {code:`import numpy as np\narr = np.array([0,255,0,255,0],\n               dtype=np.uint8)\nprint(int(np.mean(arr)))`, answer:`102`, hint:'(0+255+0+255+0)/5 = 102'},
-  {code:`import numpy as np\nimg = np.array([0.5])\ngamma = 1/4\nprint(round(float(np.power(img,gamma)),4))`, answer:`0.8409`, hint:'0.5^0.25 = 0.84089...'},
-];
-
-/* Total items = T1.length + T2.length + T3.length */
-const TOTAL = T1.length + T2.length + T3.length;
 
 /* ============================================================
-   BUILD UI
+   BUILD DECK
 ============================================================ */
-function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function buildDeck(filter='all'){
+  const deck = [];
+  if(filter==='all'||filter==='t1'){
+    RAW_T1.forEach((item,i)=>deck.push({type:'t1',idx:i,data:item,result:null}));
+  }
+  if(filter==='all'||filter==='t2'){
+    RAW_T2.forEach((item,i)=>deck.push({type:'t2',idx:i,data:item,result:null}));
+  }
+  if(filter==='all'||filter==='t3'){
+    RAW_T3.forEach((item,i)=>deck.push({type:'t3',idx:i,data:item,result:null}));
+  }
+  return deck;
+}
+
+/* ============================================================
+   STATE
+============================================================ */
+let deck = buildDeck('all');
+let cur = 0;
+let isFlipped = false;
+let wrongOnlyMode = false;
+let currentFilter = 'all';
+
+/* ============================================================
+   RENDER
+============================================================ */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function highlight(code){
   return esc(code)
     .replace(/(import|from|print|as)\b/g,'<span class="kw">$1</span>')
     .replace(/(cv2|np|plt)\b/g,'<span class="fn">$1</span>')
-    .replace(/'([^']*)'/g,"<span class=\"st\">'$1'</span>")
+    .replace(/'([^']*)'/g,"<span class='st'>'$1'</span>")
     .replace(/\b(\d+\.?\d*)\b/g,'<span class="nu">$1</span>')
     .replace(/(#.*)/g,'<span class="cm">$1</span>');
 }
 
-function buildT1(){
-  const grid = document.getElementById('choices-grid');
-  CHOICES.forEach(c=>{
-    const d = document.createElement('div');
-    d.className = 'choice-item' + (c.isNew ? ' new-choice' : '');
-    d.innerHTML = `<span class="choice-letter">${c.l}.</span>${esc(c.t)}`;
-    grid.appendChild(d);
-  });
+function renderCard(animDir){
+  if(deck.length === 0){ showDone(); return; }
+  if(cur >= deck.length){ showDone(); return; }
 
-  const wrap = document.getElementById('test1-wrap');
-  T1.forEach((item,i)=>{
-    const row = document.createElement('div');
-    row.className = 'match-row';
-    const cardClass = item.isNew ? 'stmt-card new-item' : 'stmt-card';
-    row.innerHTML = `
-      <input class="answer-input" type="text" maxlength="1"
-             id="t1-${i}" data-ans="${item.a}" data-section="t1"
-             placeholder="—" autocomplete="off">
-      <div class="${cardClass}">
-        <span class="item-num">${i+1}</span>${esc(item.q)}
+  const card = deck[cur];
+  const front = document.getElementById('card-front');
+  const body  = document.getElementById('card-body');
+  const back  = document.getElementById('answer-display');
+  const tag   = document.getElementById('face-tag');
+
+  // Reset flip
+  isFlipped = false;
+  document.getElementById('card-wrap').classList.remove('flipped');
+
+  // Reset state classes
+  front.classList.remove('marked-correct','marked-wrong');
+  if(card.result === true)  front.classList.add('marked-correct');
+  if(card.result === false) front.classList.add('marked-wrong');
+
+  // Animate
+  const scene = document.getElementById('scene');
+  scene.classList.remove('anim-next','anim-prev');
+  void scene.offsetWidth;
+  if(animDir === 1) scene.classList.add('anim-next');
+  if(animDir === -1) scene.classList.add('anim-prev');
+
+  /* FRONT CONTENT */
+  if(card.type === 't1'){
+    tag.textContent = 'MATCHING — What matches this description?';
+    body.innerHTML = `
+      <span class="section-badge">Test 1 · Item ${card.idx+1}</span>
+      <div class="question-text">${esc(card.data.q)}</div>`;
+  } else if(card.type === 't2'){
+    tag.textContent = 'STATEMENT EVAL — A / B / C / D?';
+    body.innerHTML = `
+      <span class="section-badge">Test 2 · Item ${RAW_T1.length + card.idx + 1}</span>
+      <div class="sub-stmt"><div class="stmt-label">Statement 1</div>${esc(card.data.s1)}</div>
+      <div class="sub-stmt"><div class="stmt-label">Statement 2</div>${esc(card.data.s2)}</div>
+      <div style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:0.3px;">
+        A = S1 only &nbsp;·&nbsp; B = S2 only &nbsp;·&nbsp; C = Both &nbsp;·&nbsp; D = Neither
       </div>`;
-    wrap.appendChild(row);
-  });
+  } else {
+    tag.textContent = 'CODE OUTPUT — What does this print?';
+    body.innerHTML = `
+      <span class="section-badge">Test 3 · Item ${RAW_T1.length + RAW_T2.length + card.idx + 1}</span>
+      <div class="code-block">${highlight(card.data.code)}</div>
+      <div style="font-size:11px;color:var(--muted);font-style:italic">Hint: ${esc(card.data.hint)}</div>`;
+  }
+
+  /* BACK CONTENT */
+  if(card.type === 't1'){
+    const letter = card.data.a;
+    const fullText = CHOICES_MAP[letter] || letter;
+    back.innerHTML = `
+      <div class="answer-label">Correct Answer</div>
+      <div class="answer-main">${esc(letter)}</div>
+      <div class="answer-sub">${esc(fullText)}</div>`;
+  } else if(card.type === 't2'){
+    const letter = card.data.ans;
+    back.innerHTML = `
+      <div class="answer-label">Correct Answer</div>
+      <div class="answer-main">${esc(letter)}</div>
+      <div class="answer-sub">${esc(T2_LABELS[letter])}</div>
+      <div class="answer-map">
+        ${['A','B','C','D'].map(l=>`<div class="map-chip ${l===letter?'hl':''}">${l} — ${T2_LABELS[l].split(' ')[0]+' '+T2_LABELS[l].split(' ')[1]}</div>`).join('')}
+      </div>`;
+  } else {
+    const ans = card.data.answer;
+    const isLong = ans.includes('\n') || ans.length > 10;
+    back.innerHTML = `
+      <div class="answer-label">Expected Output</div>
+      <div class="answer-main ${isLong?'answer-long':''}">${esc(ans)}</div>`;
+  }
+
+  /* Progress */
+  updateProgress();
+
+  document.getElementById('btn-prev').disabled = (cur === 0);
+  document.getElementById('btn-next').disabled = (cur >= deck.length - 1);
 }
 
-function buildT2(){
-  const wrap = document.getElementById('test2-wrap');
-  T2.forEach((item,i)=>{
-    const row = document.createElement('div');
-    row.className = 'tf-row';
-    const num = T1.length + i + 1;
-    row.innerHTML = `
-      <input class="answer-input" type="text" maxlength="1"
-             id="t2-${i}" data-ans="${item.ans}" data-section="t2"
-             placeholder="—" autocomplete="off">
-      <div class="tf-card">
-        <div class="tf-stmt"><span class="stmt-tag">S1&nbsp;</span><span class="item-num">${num}</span>${esc(item.s1)}</div>
-        <div class="tf-stmt"><span class="stmt-tag">S2&nbsp;</span>${esc(item.s2)}</div>
-      </div>`;
-    wrap.appendChild(row);
-  });
-}
-
-function buildT3(){
-  const wrap = document.getElementById('test3-wrap');
-  T3.forEach((item,i)=>{
-    const row = document.createElement('div');
-    row.className = 'code-row';
-    const num = T1.length + T2.length + i + 1;
-    row.innerHTML = `
-      <div>
-        <div class="code-label">
-          <span>Code Snippet</span>
-          <span class="item-badge">#${num}</span>
-        </div>
-        <div class="code-block">${highlight(item.code)}</div>
-      </div>
-      <div>
-        <div class="code-label"><span>Your Answer — Expected Output</span></div>
-        <textarea class="output-area" id="t3-${i}"
-                  data-ans="${esc(item.answer)}" data-section="t3"
-                  placeholder="Type the output exactly..."></textarea>
-        <div class="hint-text">Hint: ${esc(item.hint)}</div>
-      </div>`;
-    wrap.appendChild(row);
-  });
-}
-
-/* ============================================================
-   LIVE PROGRESS
-============================================================ */
 function updateProgress(){
-  let filled = 0;
-  document.querySelectorAll('.answer-input').forEach(el=>{
-    if(el.value.trim()) filled++;
+  const done = deck.filter(c=>c.result!==null).length;
+  const correct = deck.filter(c=>c.result===true).length;
+  const wrong   = deck.filter(c=>c.result===false).length;
+  const pct = deck.length > 0 ? ((cur+1)/deck.length)*100 : 0;
+
+  document.getElementById('cur-num').textContent  = Math.min(cur+1, deck.length);
+  document.getElementById('total-num').textContent = deck.length;
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent   = wrong;
+  document.getElementById('bar-fill').style.width     = pct+'%';
+}
+
+function flipCard(){
+  isFlipped = !isFlipped;
+  document.getElementById('card-wrap').classList.toggle('flipped', isFlipped);
+}
+
+function navigate(dir){
+  const next = cur + dir;
+  if(next < 0 || next >= deck.length) return;
+  cur = next;
+  renderCard(dir);
+}
+
+function markCard(correct){
+  deck[cur].result = correct;
+  // Auto-advance after brief delay so user sees the glow
+  const front = document.getElementById('card-front');
+  front.classList.remove('marked-correct','marked-wrong');
+  front.classList.add(correct ? 'marked-correct' : 'marked-wrong');
+  updateProgress();
+  setTimeout(()=>{ if(cur < deck.length-1){ cur++; renderCard(1); } else { showDone(); } }, 420);
+}
+
+function showDone(){
+  const correct = deck.filter(c=>c.result===true).length;
+  const wrong   = deck.filter(c=>c.result===false).length;
+  const pct = deck.length > 0 ? Math.round((correct/deck.length)*100) : 0;
+  document.getElementById('done-correct').textContent = correct;
+  document.getElementById('done-wrong').textContent   = wrong;
+  document.getElementById('done-pct').textContent     = pct+'%';
+  document.getElementById('scene').style.display         = 'none';
+  document.getElementById('action-row').style.display    = 'none';
+  document.getElementById('progress-wrap').style.display = 'none';
+  document.getElementById('done-screen').classList.add('visible');
+}
+
+function hideDone(){
+  document.getElementById('scene').style.display         = '';
+  document.getElementById('action-row').style.display    = '';
+  document.getElementById('progress-wrap').style.display = '';
+  document.getElementById('done-screen').classList.remove('visible');
+}
+
+function restartDeck(){
+  hideDone();
+  deck = buildDeck(currentFilter);
+  deck.forEach(c=>c.result=null);
+  cur = 0;
+  wrongOnlyMode = false;
+  document.getElementById('btn-wrong-only').classList.remove('active');
+  renderCard(0);
+}
+
+function shuffleDeck(){
+  for(let i=deck.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [deck[i],deck[j]]=[deck[j],deck[i]];
+  }
+  cur=0;
+  renderCard(0);
+}
+
+function filterDeck(filter){
+  currentFilter = filter;
+  document.querySelectorAll('.deck-tab').forEach(t=>{
+    t.classList.toggle('active', t.dataset.deck===filter);
   });
-  document.querySelectorAll('.output-area').forEach(el=>{
-    if(el.value.trim()) filled++;
-  });
-  const pct = Math.round((filled/TOTAL)*100);
-  document.getElementById('prog-bar').style.width = pct+'%';
-  document.getElementById('hdr-answered').textContent = filled+' answered';
+  hideDone();
+  deck = buildDeck(filter);
+  deck.forEach(c=>c.result=null);
+  cur=0;
+  wrongOnlyMode = false;
+  document.getElementById('btn-wrong-only').classList.remove('active');
+  renderCard(0);
+}
+
+function toggleWrongOnly(){
+  const btn = document.getElementById('btn-wrong-only');
+  wrongOnlyMode = !wrongOnlyMode;
+  btn.classList.toggle('active', wrongOnlyMode);
+  if(wrongOnlyMode){
+    const allDeck = buildDeck(currentFilter);
+    // Mark from previous results
+    const wrongCards = allDeck.filter(c=>{
+      const matched = deck.find(d=>d.type===c.type&&d.idx===c.idx);
+      return matched && matched.result === false;
+    });
+    deck = wrongCards.length > 0 ? wrongCards : allDeck.filter(c=>c.result===false);
+    if(deck.length===0){ deck = buildDeck(currentFilter); }
+    deck.forEach(c=>c.result=null);
+  } else {
+    deck = buildDeck(currentFilter);
+    deck.forEach(c=>c.result=null);
+  }
+  hideDone();
+  cur=0;
+  renderCard(0);
 }
 
 /* ============================================================
-   SUBMIT
+   KEYBOARD
 ============================================================ */
-function submitExam(){
-  let correct = 0;
-
-  document.querySelectorAll('.answer-input').forEach(el=>{
-    const user = el.value.trim().toUpperCase();
-    const ans  = el.dataset.ans.toUpperCase();
-    el.classList.remove('correct','wrong');
-    if(user === ans){ correct++; el.classList.add('correct'); }
-    else if(user)    el.classList.add('wrong');
-  });
-
-  document.querySelectorAll('.output-area').forEach(el=>{
-    const user = el.value.trim().replace(/[ \t]+/g,' ');
-    const ans  = el.dataset.ans.trim().replace(/[ \t]+/g,' ');
-    el.classList.remove('correct','wrong');
-    if(user === ans){ correct++; el.classList.add('correct'); }
-    else if(el.value.trim()) el.classList.add('wrong');
-  });
-
-  const pct = Math.round((correct/TOTAL)*100);
-  let grade, msg;
-  if(pct>=95){ grade='A+'; msg='Perfect or near-perfect. Exceptional mastery of the material!';}
-  else if(pct>=90){ grade='A'; msg='Excellent! Strong command of image processing concepts.';}
-  else if(pct>=85){ grade='B+'; msg='Very good! A few concepts need revisiting.';}
-  else if(pct>=80){ grade='B'; msg='Good work. Review the highlighted incorrect items.';}
-  else if(pct>=75){ grade='C+'; msg='Passing. Spend time reviewing incorrect answers carefully.';}
-  else if(pct>=70){ grade='C'; msg='Passing. Significant review recommended.';}
-  else { grade='F'; msg='Below passing. Re-read the slides and try again.';}
-
-  const banner = document.getElementById('result-banner');
-  document.getElementById('final-score').textContent = `${correct} / ${TOTAL} — ${pct}% (${grade})`;
-  document.getElementById('final-msg').textContent = msg;
-  banner.style.display = 'block';
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-
-/* ============================================================
-   SCROLL TO TOP
-============================================================ */
-window.addEventListener('scroll',()=>{
-  const btn = document.getElementById('scroll-top');
-  btn.classList.toggle('visible', window.scrollY > 400);
+document.addEventListener('keydown', e=>{
+  if(e.key===' '){ e.preventDefault(); flipCard(); }
+  if(e.key==='ArrowRight') navigate(1);
+  if(e.key==='ArrowLeft')  navigate(-1);
+  if(e.key==='1') markCard(true);
+  if(e.key==='2') markCard(false);
 });
 
 /* ============================================================
    INIT
 ============================================================ */
-buildT1();
-buildT2();
-buildT3();
-
-// Update header total dynamically
-document.querySelector('.header-meta span').innerHTML =
-  `<span class="dot"></span> ${TOTAL} items`;
-
-document.addEventListener('input', updateProgress);
-
-document.addEventListener('keyup', e=>{
-  if(!e.target.classList.contains('answer-input')) return;
-  if(e.target.value.trim().length === 1){
-    const inputs = [...document.querySelectorAll('.answer-input')];
-    const idx = inputs.indexOf(e.target);
-    if(idx < inputs.length-1) inputs[idx+1].focus();
-  }
-});
-
-/* ============================================================
-   CHEAT CODE — press A then N then S to reveal all answers
-============================================================ */
-(function(){
-  const SEQ = ['a','n','s'];
-  let buf = [];
-  let revealed = false;
-
-  document.addEventListener('keydown', e=>{
-    if(e.target.tagName === 'TEXTAREA') return;
-    const key = e.key.toLowerCase();
-    buf.push(key);
-    if(buf.length > SEQ.length) buf.shift();
-    if(buf.join('') === SEQ.join('')){
-      buf = [];
-      revealed = !revealed;
-      toggleAnswers(revealed);
-    }
-  });
-
-  function toggleAnswers(show){
-    document.querySelectorAll('.answer-input').forEach(el=>{
-      if(show){
-        el.dataset.orig = el.value;
-        el.value = el.dataset.ans;
-        el.classList.remove('correct','wrong');
-        el.classList.add('cheat-fill');
-      } else {
-        el.value = el.dataset.orig ?? '';
-        el.classList.remove('cheat-fill');
-      }
-    });
-    document.querySelectorAll('.output-area').forEach(el=>{
-      if(show){
-        el.dataset.orig = el.value;
-        el.value = el.dataset.ans;
-        el.classList.remove('correct','wrong');
-        el.classList.add('cheat-fill');
-      } else {
-        el.value = el.dataset.orig ?? '';
-        el.classList.remove('cheat-fill');
-      }
-    });
-    showToast(show
-      ? '🔓 Answers revealed — press A+N+S again to hide'
-      : '🔒 Answers hidden');
-    updateProgress();
-  }
-
-  function showToast(msg){
-    let toast = document.getElementById('cheat-toast');
-    if(!toast){
-      toast = document.createElement('div');
-      toast.id = 'cheat-toast';
-      toast.style.cssText = `
-        position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
-        background:#1e2026; border:1px solid var(--accent);
-        color:var(--accent); font-family:'IBM Plex Mono',monospace;
-        font-size:12px; padding:9px 20px; border-radius:8px;
-        z-index:9999; white-space:nowrap;
-        box-shadow:0 4px 24px rgba(0,0,0,0.5);
-        transition:opacity 0.3s;
-      `;
-      document.body.appendChild(toast);
-    }
-    toast.textContent = msg;
-    toast.style.opacity = '1';
-    clearTimeout(toast._t);
-    toast._t = setTimeout(()=>{ toast.style.opacity='0'; }, 2800);
-  }
-})();
+renderCard(0);
 </script>
 </body>
 </html>
